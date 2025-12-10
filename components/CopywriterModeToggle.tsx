@@ -16,7 +16,7 @@ const CopywriterModeToggle: React.FC<CopywriterModeToggleProps> = ({ isActive, o
       }`}
       title={isActive ? 'Modo Copywriter ativo' : 'Ativar modo Copywriter'}
     >
-      {isActive ? '✍️ Copywriter' : '✍️ Copywriter'}
+      Copywriter
     </button>
   );
 };
