@@ -59,7 +59,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack }) => {
     initTheme(); // Initialize theme
     checkAndMigrate(); // Migrate old data if needed
     
-    // Load onboarding data
+    // Load onboarding data first
     const user = getCurrentUser();
     if (user) {
       const savedOnboarding = localStorage.getItem(`erl_lia_onboarding_${user.email}`);
@@ -78,22 +78,39 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack }) => {
     if (savedHistory) {
       try {
         const parsedHistory = JSON.parse(savedHistory);
-        setMessages(parsedHistory);
+        // Só carregar histórico se tiver mais de 1 mensagem (não apenas a mensagem de boas-vindas)
+        if (parsedHistory.length > 1) {
+          setMessages(parsedHistory);
+        } else {
+          initializeWelcomeMessage(true);
+        }
       } catch (error) {
         console.error("Failed to parse chat history:", error);
-        initializeWelcomeMessage();
+        initializeWelcomeMessage(true);
       }
     } else {
-      initializeWelcomeMessage();
+      initializeWelcomeMessage(true);
     }
     setIsInitialized(true);
   }, []);
 
-  const initializeWelcomeMessage = () => {
+  const initializeWelcomeMessage = (useOnboarding: boolean = true) => {
+    // Criar mensagem de boas-vindas personalizada baseada no onboarding
+    const data = useOnboarding ? onboardingData : undefined;
+    let welcomeText = "Olá! Eu sou a LIA, sua mentora de negócios digitais com o Método ERL.\n\n";
+    
+    if (data?.profissao || data?.habilidadePrincipal) {
+      welcomeText += "Vou te ajudar a estruturar seu produto, seu funil e seu conteúdo.\n\n";
+      welcomeText += "Como posso te ajudar hoje?";
+    } else {
+      welcomeText += "Vou te ajudar a estruturar seu produto, seu funil e seu conteúdo.\n\n";
+      welcomeText += "Para começarmos, me conta: qual é a sua profissão ou habilidade principal hoje?";
+    }
+    
     setMessages([
       {
-        id: 'welcome',
-        text: "Oi! Eu sou a LIA, sua mentora de negócios digitais com o Método ERL. \n\nVou te ajudar a estruturar seu produto, seu funil e seu conteúdo. Para começarmos, me conta: qual é a sua profissão ou habilidade principal hoje?",
+        id: `welcome-${Date.now()}`,
+        text: welcomeText,
         sender: Sender.AI,
         timestamp: Date.now(),
       },
@@ -242,6 +259,45 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack }) => {
     }
   };
 
+  const handleNewConversation = () => {
+    // Limpar estado local
+    setMessages([]);
+    setCopywriterResponse(null);
+    setShowAnalysis(false);
+    setInputText('');
+    setSelectedImage(null);
+    setImagePreviewUrl(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+    
+    // Limpar localStorage
+    const storageKey = getStorageKey();
+    localStorage.removeItem(storageKey);
+    
+    // Inicializar mensagem de boas-vindas (usa onboardingData atual)
+    initializeWelcomeMessage(true);
+  };
+
+  const handleClearAllHistory = () => {
+    if (window.confirm('Tem certeza que deseja limpar todo o histórico de conversas? Esta ação não pode ser desfeita.')) {
+      // Limpar estado local
+      setMessages([]);
+      setCopywriterResponse(null);
+      setShowAnalysis(false);
+      setInputText('');
+      setSelectedImage(null);
+      setImagePreviewUrl(null);
+      
+      // Limpar localStorage
+      const storageKey = getStorageKey();
+      localStorage.removeItem(storageKey);
+      
+      // Inicializar mensagem de boas-vindas
+      initializeWelcomeMessage();
+    }
+  };
+
   if (!isInitialized) return null;
 
   const analysis = messages.length > 0 ? analyzeConversation(messages) : null;
@@ -258,6 +314,13 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack }) => {
             {messages.length > 0 && (
               <>
                 <button
+                  onClick={handleNewConversation}
+                  className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700"
+                  title="Iniciar nova conversa"
+                >
+                  ✨ Nova Conversa
+                </button>
+                <button
                   onClick={() => setShowAnalysis(!showAnalysis)}
                   className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                     showAnalysis 
@@ -271,11 +334,22 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack }) => {
               </>
             )}
           </div>
-          {copywriterMode && (
-            <p className="text-xs text-slate-500 dark:text-slate-400">
-              Modo Copywriter ativo
-            </p>
-          )}
+          <div className="flex items-center gap-2">
+            {copywriterMode && (
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Modo Copywriter ativo
+              </p>
+            )}
+            {messages.length > 0 && (
+              <button
+                onClick={handleClearAllHistory}
+                className="px-3 py-1.5 rounded-lg text-xs font-medium transition-colors bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 hover:bg-red-100 dark:hover:bg-red-900/30"
+                title="Limpar todo o histórico"
+              >
+                🗑️ Limpar Histórico
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
