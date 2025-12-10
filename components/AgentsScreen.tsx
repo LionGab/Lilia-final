@@ -1,0 +1,227 @@
+import React, { useState, useEffect } from 'react';
+import { AGENTS, CATEGORIES, Agent } from '../types/agents';
+import { getCurrentUser } from '../services/authService';
+import { groupConversationsBySession } from '../services/historyService';
+import { Message } from '../types';
+import { initTheme } from '../services/themeService';
+import ThemeToggle from './ThemeToggle';
+
+interface AgentsScreenProps {
+  onSelectAgent: (agentId: string) => void;
+  onViewHistory: (sessionId: string) => void;
+  onViewTutorials?: () => void;
+  onViewIdeas?: () => void;
+  onViewPersonalization?: () => void;
+}
+
+const AgentsScreen: React.FC<AgentsScreenProps> = ({ onSelectAgent, onViewHistory, onViewTutorials, onViewIdeas, onViewPersonalization }) => {
+  const [selectedCategory, setSelectedCategory] = useState<string>('todos');
+  const [showSidebar, setShowSidebar] = useState(true);
+  const user = getCurrentUser();
+
+  useEffect(() => {
+    initTheme();
+  }, []);
+
+  // Carregar histórico do localStorage
+  const loadHistory = (): Message[] => {
+    if (!user) return [];
+    const storageKey = `erl_lia_chat_history_${user.email}`;
+    const savedHistory = localStorage.getItem(storageKey);
+    if (savedHistory) {
+      try {
+        return JSON.parse(savedHistory);
+      } catch {
+        return [];
+      }
+    }
+    return [];
+  };
+
+  const messages = loadHistory();
+  const sessions = groupConversationsBySession(messages);
+
+  const filteredAgents = selectedCategory === 'todos'
+    ? AGENTS.filter(a => a.enabled)
+    : selectedCategory === 'arquitetos'
+    ? AGENTS.filter(a => a.enabled && a.category === 'outros')
+    : AGENTS.filter(a => a.enabled && a.category === selectedCategory);
+
+  const getAgentColorClass = (color: Agent['color']) => {
+    switch (color) {
+      case 'orange':
+        return 'bg-orange-100 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400';
+      case 'blue':
+        return 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400';
+      case 'purple':
+        return 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400';
+      case 'green':
+        return 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400';
+      default:
+        return 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300';
+    }
+  };
+
+  return (
+    <div className="flex h-screen bg-white dark:bg-slate-900 text-slate-900 dark:text-white overflow-hidden transition-colors">
+      {/* Sidebar */}
+      {showSidebar && (
+        <aside className="w-64 bg-slate-50 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col transition-colors">
+          {/* Logo */}
+          <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+            <h1 className="text-xl font-bold">
+              <span className="text-slate-900 dark:text-white">Funil</span>
+              <span className="text-brand-600 dark:text-brand-400"> ERL</span>
+            </h1>
+          </div>
+
+          {/* Navigation */}
+          <nav className="p-3 space-y-1">
+            <button className="w-full flex items-center gap-3 px-3 py-2 bg-brand-50 dark:bg-brand-900/20 text-brand-700 dark:text-brand-400 rounded-lg text-left hover:bg-brand-100 dark:hover:bg-brand-900/30 transition-colors">
+              <span className="text-sm">🤖</span>
+              <span className="text-sm font-medium">Agentes</span>
+            </button>
+            <button 
+              onClick={onViewPersonalization}
+              className="w-full flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-left transition-colors"
+            >
+              <span className="text-sm">⚙️</span>
+              <span className="text-sm">Personalização</span>
+            </button>
+            <button 
+              onClick={onViewTutorials}
+              className="w-full flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-left transition-colors"
+            >
+              <span className="text-sm">🎓</span>
+              <span className="text-sm">Tutoriais</span>
+            </button>
+            <button 
+              onClick={onViewIdeas}
+              className="w-full flex items-center gap-3 px-3 py-2 text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-left transition-colors"
+            >
+              <span className="text-sm">👥</span>
+              <span className="text-sm">Indicações</span>
+            </button>
+          </nav>
+
+          {/* History */}
+          <div className="flex-1 overflow-y-auto p-3 border-t border-slate-200 dark:border-slate-700">
+            <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 px-2 uppercase tracking-wide">Histórico</h3>
+            <div className="space-y-1">
+              {sessions.slice(0, 8).map((session) => (
+                <div
+                  key={session.id}
+                  className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors group"
+                  onClick={() => onViewHistory(session.id)}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-slate-700 dark:text-slate-300 truncate">{session.summary}</p>
+                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{session.date}</p>
+                    </div>
+                  </div>
+                </div>
+              ))}
+              {sessions.length > 8 && (
+                <button className="w-full text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-center py-2">
+                  Carregar mais →
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* User Info */}
+          {user && (
+            <div className="p-3 border-t border-slate-200 dark:border-slate-700">
+              <div className="flex items-center gap-2">
+                <div className="w-8 h-8 rounded-full bg-brand-100 dark:bg-brand-900/30 text-brand-700 dark:text-brand-400 flex items-center justify-center text-xs font-semibold">
+                  {user.email.substring(0, 2).toUpperCase()}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs font-medium text-slate-700 dark:text-slate-300 truncate">{user.email}</p>
+                </div>
+              </div>
+            </div>
+          )}
+        </aside>
+      )}
+
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-slate-900 transition-colors">
+        {/* Header */}
+        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center justify-between transition-colors">
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setShowSidebar(!showSidebar)}
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors"
+            >
+              <span className="text-slate-600 dark:text-slate-400">☰</span>
+            </button>
+            <h2 className="text-xl font-semibold text-slate-900 dark:text-white">Todos os Agentes</h2>
+          </div>
+          <ThemeToggle />
+        </header>
+
+        {/* Filters */}
+        <div className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-6 py-3 transition-colors">
+          <div className="flex gap-2 flex-wrap">
+            {CATEGORIES.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => setSelectedCategory(category.id)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  selectedCategory === category.id
+                    ? 'bg-brand-600 dark:bg-brand-500 text-white'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                }`}
+              >
+                {category.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Agents Grid */}
+        <div className="flex-1 overflow-y-auto p-6 bg-slate-50 dark:bg-slate-900 transition-colors">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-7xl mx-auto">
+            {filteredAgents.map((agent) => (
+              <div
+                key={agent.id}
+                className="bg-white dark:bg-slate-800 rounded-xl p-5 border border-slate-200 dark:border-slate-700 hover:border-brand-300 dark:hover:border-brand-500 hover:shadow-lg dark:hover:shadow-xl transition-all cursor-pointer group"
+                onClick={() => onSelectAgent(agent.id)}
+              >
+                <div className="flex items-start justify-between mb-4">
+                  <div className={`w-12 h-12 rounded-xl ${getAgentColorClass(agent.color)} flex items-center justify-center text-xl shadow-sm`}>
+                    {agent.icon}
+                  </div>
+                  <button className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-opacity">
+                    <span className="text-xs text-slate-400 dark:text-slate-500">🕐</span>
+                  </button>
+                </div>
+
+                <div>
+                  <div className="flex flex-wrap gap-1 mb-3">
+                    {agent.tags.map((tag, i) => (
+                      <span
+                        key={i}
+                        className="px-2 py-0.5 bg-slate-100 dark:bg-slate-700 text-xs text-slate-600 dark:text-slate-300 rounded-md"
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                  <h3 className="text-base font-semibold text-slate-900 dark:text-white mb-1">{agent.name}</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 mb-2">{agent.title}</p>
+                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{agent.description}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </main>
+    </div>
+  );
+};
+
+export default AgentsScreen;
+
