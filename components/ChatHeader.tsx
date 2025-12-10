@@ -29,8 +29,18 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onBack, onViewConversations }) 
             </svg>
           </button>
         )}
-        <div className="w-8 h-8 rounded-lg bg-brand-600 dark:bg-brand-500 flex items-center justify-center text-white font-semibold text-sm">
-          L
+        <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center bg-white dark:bg-slate-800 flex-shrink-0">
+          <img 
+            src="/images/logo-main.jpg" 
+            alt="LIA Logo" 
+            className="w-full h-full object-cover"
+            onError={(e) => {
+              // Fallback se a imagem não carregar
+              const target = e.target as HTMLImageElement;
+              target.style.display = 'none';
+              target.parentElement!.innerHTML = '<div class="w-full h-full bg-brand-600 dark:bg-brand-500 flex items-center justify-center text-white font-semibold text-sm">L</div>';
+            }}
+          />
         </div>
         <div>
           <h1 className="font-semibold text-slate-900 dark:text-white text-base leading-tight">LIA</h1>

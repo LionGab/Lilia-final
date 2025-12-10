@@ -68,7 +68,18 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({ onSelectAgent, onViewHistor
       {showSidebar && (
         <aside className="w-64 bg-slate-50 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col transition-colors">
           {/* Logo */}
-          <div className="p-6 border-b border-slate-200 dark:border-slate-700">
+          <div className="p-6 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
+            <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+              <img 
+                src="/images/logo-main.jpg" 
+                alt="Funil ERL Logo" 
+                className="w-full h-full object-cover"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
+              />
+            </div>
             <h1 className="text-xl font-bold">
               <span className="text-slate-900 dark:text-white">Funil</span>
               <span className="text-brand-600 dark:text-brand-400"> ERL</span>

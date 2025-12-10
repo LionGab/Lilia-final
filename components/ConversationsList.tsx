@@ -116,8 +116,19 @@ const ConversationsList: React.FC<ConversationsListProps> = ({
               >
                 <div className="flex items-start gap-3">
                   {/* Avatar */}
-                  <div className="flex-none w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 font-semibold text-sm">
-                    L
+                  <div className="flex-none w-10 h-10 rounded-full overflow-hidden bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center flex-shrink-0">
+                    <img 
+                      src="/images/logo-main.jpg" 
+                      alt="LIA" 
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.style.display = 'none';
+                        const parent = target.parentElement!;
+                        parent.className = 'flex-none w-10 h-10 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 font-semibold text-sm flex-shrink-0';
+                        parent.textContent = 'L';
+                      }}
+                    />
                   </div>
                   
                   {/* Conteúdo */}
