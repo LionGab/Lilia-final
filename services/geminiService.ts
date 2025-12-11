@@ -4,6 +4,7 @@ import { Message, Sender } from "../types";
 import { OnboardingData } from "../types/onboarding";
 import { AI_CONFIG } from "../constants/aiConfig";
 import { enrichContext, optimizeContext } from "./contextService";
+import { logger } from "./logger";
 
 // Initialize the Gemini AI client
 // The API key is injected automatically from the environment
@@ -43,19 +44,55 @@ const getAI = (): GoogleGenAI => {
   return aiInstance;
 };
 
-// Convert internal Message format to Gemini Content format
+/**
+ * Converte formato interno de Message para formato Content do Gemini
+ * Valida e sanitiza dados antes da conversão
+ */
 const formatHistory = (messages: Message[]): Content[] => {
-  return messages.map((msg) => ({
-    role: msg.sender === Sender.User ? "user" : "model",
-    parts: [{ text: msg.text || '' }], // Ensure text is always a string for history
-  }));
+  if (!Array.isArray(messages)) {
+    logger.warn('formatHistory recebeu dados inválidos', { messages });
+    return [];
+  }
+
+  return messages
+    .filter((msg): msg is Message => {
+      if (!msg || typeof msg !== 'object') return false;
+      if (!msg.sender || (msg.sender !== Sender.User && msg.sender !== Sender.AI)) return false;
+      return true;
+    })
+    .map((msg) => ({
+      role: msg.sender === Sender.User ? "user" : "model",
+      parts: [{ text: String(msg.text || '').trim() }],
+    }))
+    .filter((content) => {
+      // Remover mensagens vazias
+      const hasText = content.parts.some(part => 'text' in part && part.text.length > 0);
+      return hasText;
+    });
 };
 
 /**
  * Retry logic com exponential backoff
  */
 const sleep = (ms: number): Promise<void> => {
+  if (ms < 0 || !Number.isFinite(ms)) {
+    logger.warn('sleep recebeu valor inválido', { ms });
+    return Promise.resolve();
+  }
   return new Promise(resolve => setTimeout(resolve, ms));
+};
+
+/**
+ * Valida se uma string é um base64 válido
+ */
+const isValidBase64 = (str: string): boolean => {
+  if (!str || typeof str !== 'string') return false;
+  
+  const base64Data = str.includes(',') ? str.split(',')[1] : str;
+  
+  // Regex para validar base64
+  const base64Regex = /^[A-Za-z0-9+/]*={0,2}$/;
+  return base64Regex.test(base64Data) && base64Data.length > 0;
 };
 
 /**
@@ -85,7 +122,12 @@ const retryWithBackoff = async <T>(
       // Se não for a última tentativa, esperar antes de tentar novamente
       if (attempt < maxRetries) {
         const waitTime = delay * Math.pow(2, attempt); // Exponential backoff
-        console.warn(`Tentativa ${attempt + 1} falhou. Tentando novamente em ${waitTime}ms...`);
+        logger.warn(`Tentativa ${attempt + 1} falhou. Tentando novamente em ${waitTime}ms...`, {
+          attempt: attempt + 1,
+          maxRetries,
+          waitTime,
+          error: lastError?.message,
+        });
         await sleep(waitTime);
       }
     }
@@ -94,18 +136,55 @@ const retryWithBackoff = async <T>(
   throw lastError || new Error('Falha após múltiplas tentativas');
 };
 
+export interface GeminiResponse {
+  text: string | undefined;
+  imageUrl: string | undefined;
+  mimeType: string | undefined;
+}
+
+/**
+ * Envia conteúdo para o Gemini AI e retorna resposta formatada
+ * 
+ * @param currentHistory - Histórico de mensagens da conversa
+ * @param newMessage - Nova mensagem de texto do usuário
+ * @param base64Image - Dados de imagem em base64 (opcional)
+ * @param imageMimeType - Tipo MIME da imagem (opcional)
+ * @param base64Audio - Dados de áudio em base64 (opcional)
+ * @param audioMimeType - Tipo MIME do áudio (opcional)
+ * @param onboardingContext - Contexto do onboarding do usuário (opcional)
+ * @returns Resposta do Gemini com texto, imagem e tipo MIME
+ * @throws Error se nenhum conteúdo for fornecido ou se houver erro na API
+ */
 export const sendContentToGemini = async (
   currentHistory: Message[],
   newMessage: string,
-  base64Image?: string, // Optional base64 image data
-  imageMimeType?: string, // Optional image MIME type
-  base64Audio?: string, // Optional base64 audio data
-  audioMimeType?: string, // Optional audio MIME type
-  onboardingContext?: OnboardingData, // Novo parâmetro
-): Promise<{ text: string | undefined; imageUrl: string | undefined; mimeType: string | undefined }> => {
+  base64Image?: string,
+  imageMimeType?: string,
+  base64Audio?: string,
+  audioMimeType?: string,
+  onboardingContext?: OnboardingData,
+): Promise<GeminiResponse> => {
   // Validar entrada
   if (!newMessage && !base64Image && !base64Audio) {
     throw new Error("Nenhum conteúdo (texto, imagem ou áudio) fornecido para o Gemini.");
+  }
+
+  // Validar tipos de dados
+  if (base64Image && !imageMimeType) {
+    throw new Error("Tipo MIME da imagem é obrigatório quando imagem é fornecida.");
+  }
+
+  if (base64Audio && !audioMimeType) {
+    throw new Error("Tipo MIME do áudio é obrigatório quando áudio é fornecido.");
+  }
+
+  // Validar formato base64
+  if (base64Image && !isValidBase64(base64Image)) {
+    throw new Error("Formato de imagem base64 inválido.");
+  }
+
+  if (base64Audio && !isValidBase64(base64Audio)) {
+    throw new Error("Formato de áudio base64 inválido.");
   }
 
   // Usar modelo apropriado baseado no contexto
@@ -114,23 +193,35 @@ export const sendContentToGemini = async (
     ? AI_CONFIG.models.image 
     : AI_CONFIG.models.default;
 
-  // Construir partes da mensagem
-  const parts: any[] = [];
+  // Construir partes da mensagem com tipagem adequada
+  type MessagePart = 
+    | { text: string }
+    | { inlineData: { mimeType: string; data: string } };
+
+  const parts: MessagePart[] = [];
 
   if (base64Image && imageMimeType) {
+    const base64Data = base64Image.includes(',') 
+      ? base64Image.split(',')[1] 
+      : base64Image;
+    
     parts.push({
       inlineData: {
         mimeType: imageMimeType,
-        data: base64Image.split(',')[1], // Remove "data:image/png;base64," prefix
+        data: base64Data,
       },
     });
   }
 
   if (base64Audio && audioMimeType) {
+    const base64Data = base64Audio.includes(',') 
+      ? base64Audio.split(',')[1] 
+      : base64Audio;
+    
     parts.push({
       inlineData: {
         mimeType: audioMimeType,
-        data: base64Audio.split(',')[1], // Remove "data:audio/webm;base64," prefix
+        data: base64Data,
       },
     });
   }
@@ -183,15 +274,15 @@ export const sendContentToGemini = async (
 
       const history = formatHistory(currentHistory);
       
-      // Log da requisição em desenvolvimento
-      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-        console.log('Enviando requisição para Gemini:', {
-          model: modelToUse,
-          hasHistory: history.length > 0,
-          hasImage: !!base64Image,
-          hasText: !!newMessage,
-        });
-      }
+      // Log da requisição
+      logger.debug('Enviando requisição para Gemini', {
+        model: modelToUse,
+        hasHistory: history.length > 0,
+        historyLength: history.length,
+        hasImage: !!base64Image,
+        hasAudio: !!base64Audio,
+        hasText: !!newMessage,
+      });
       
       const ai = getAI();
       const response = await ai.models.generateContent({
@@ -239,14 +330,12 @@ export const sendContentToGemini = async (
         const errorMessage = error.message.toLowerCase();
         const errorString = JSON.stringify(error);
         
-        // Log detalhado para debug (apenas em desenvolvimento)
-        if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-          console.error('Erro detalhado da API Gemini:', {
-            message: error.message,
-            name: error.name,
-            errorString: errorString.substring(0, 500),
-          });
-        }
+        // Log detalhado para debug
+        logger.error('Erro detalhado da API Gemini', {
+          message: error.message,
+          name: error.name,
+          errorString: errorString.substring(0, 500),
+        });
         
         if (error.name === 'AbortError' || errorMessage.includes('timeout') || errorMessage.includes('aborted')) {
           throw new Error("A requisição demorou muito. Tente novamente.");
@@ -275,7 +364,7 @@ export const sendContentToGemini = async (
       throw error;
     }
   }).catch((error) => {
-    console.error("Error communicating with Gemini:", error);
+    logger.error("Erro ao comunicar com Gemini", error);
     
     // Mensagem amigável para o usuário
     if (error instanceof Error) {

@@ -3,11 +3,25 @@ import { COPYWRITER_SYSTEM_PROMPT } from "../constants/copywriterPrompt";
 import { CopywriterResponse, TargetAudience, CopyStructure } from "../types/copywriter";
 import { OnboardingData } from "../types/onboarding";
 import { AI_CONFIG } from "../constants/aiConfig";
+import { logger } from "./logger";
 
 const getApiKey = (): string => {
-  const apiKey = process.env.API_KEY || process.env.GEMINI_API_KEY;
+  const apiKey = 
+    process.env.API_KEY || 
+    process.env.GEMINI_API_KEY ||
+    (typeof window !== 'undefined' && (window as { __GEMINI_API_KEY__?: string }).__GEMINI_API_KEY__) ||
+    '';
+  
   if (!apiKey || apiKey === 'undefined' || apiKey === 'null' || apiKey.trim() === '') {
-    throw new Error('Chave da API Gemini não encontrada. Verifique o arquivo .env.local');
+    const isProduction = typeof window !== 'undefined' && 
+      window.location.hostname !== 'localhost' && 
+      window.location.hostname !== '127.0.0.1';
+    
+    if (isProduction) {
+      throw new Error('Chave da API Gemini não encontrada. Configure a variável de ambiente GEMINI_API_KEY no Netlify Dashboard.');
+    } else {
+      throw new Error('Chave da API Gemini não encontrada. Verifique o arquivo .env.local');
+    }
   }
   return apiKey.trim();
 };
@@ -16,18 +30,35 @@ const getApiKey = (): string => {
 let aiInstance: GoogleGenAI | null = null;
 const getAI = (): GoogleGenAI => {
   if (!aiInstance) {
-    aiInstance = new GoogleGenAI({ apiKey: getApiKey() });
+    try {
+      aiInstance = new GoogleGenAI({ apiKey: getApiKey() });
+    } catch (error) {
+      if (error instanceof Error) {
+        throw error;
+      }
+      throw new Error('Erro ao inicializar cliente Gemini para copywriter');
+    }
   }
   return aiInstance;
 };
 
 /**
  * Processa uma requisição de copywriter seguindo os 10 passos
+ * 
+ * @param userInput - Input do usuário com ideia/produto/nicho
+ * @param context - Contexto do onboarding do usuário (opcional)
+ * @returns Resposta estruturada do copywriter
+ * @throws Error se houver falha no processamento
  */
 export const processCopywriterRequest = async (
   userInput: string,
   context?: OnboardingData
 ): Promise<CopywriterResponse> => {
+  // Validar entrada
+  if (!userInput || typeof userInput !== 'string' || userInput.trim().length === 0) {
+    throw new Error('Input do usuário é obrigatório e não pode estar vazio.');
+  }
+
   try {
     // Construir prompt completo
     let fullPrompt = COPYWRITER_SYSTEM_PROMPT;
@@ -89,7 +120,15 @@ export const processCopywriterRequest = async (
 
     return parsedResponse;
   } catch (error) {
-    console.error("Erro ao processar requisição de copywriter:", error);
+    logger.error("Erro ao processar requisição de copywriter", error);
+    
+    if (error instanceof Error) {
+      // Se já é um erro conhecido, propagar
+      if (error.message.includes('API') || error.message.includes('chave')) {
+        throw error;
+      }
+    }
+    
     throw new Error("Falha ao processar sua solicitação de copywriting. Tente novamente.");
   }
 };
@@ -170,25 +209,46 @@ const parseCopywriterResponse = (
 
 // Funções auxiliares de parsing (implementação básica)
 const extractList = (text: string, keyword: string): string[] => {
-  const regex = new RegExp(`${keyword}[\\s:]*([\\s\\S]*?)(?=\\n\\n|$)`, 'i');
-  const match = text.match(regex);
-  if (!match) return [];
-  
-  return match[1]
-    .split('\n')
-    .map(line => line.replace(/^[-•*]\s*/, '').trim())
-    .filter(line => line.length > 0)
-    .slice(0, 10);
+  if (!text || typeof text !== 'string' || !keyword || typeof keyword !== 'string') {
+    return [];
+  }
+
+  try {
+    const regex = new RegExp(`${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[\\s:]*([\\s\\S]*?)(?=\\n\\n|$)`, 'i');
+    const match = text.match(regex);
+    if (!match || !match[1]) return [];
+    
+    return match[1]
+      .split('\n')
+      .map(line => line.replace(/^[-•*]\s*/, '').trim())
+      .filter(line => line.length > 0)
+      .slice(0, 10);
+  } catch (error) {
+    logger.warn('Erro ao extrair lista', { keyword, error });
+    return [];
+  }
 };
 
 const extractSection = (text: string, ...keywords: string[]): string => {
-  for (const keyword of keywords) {
-    const regex = new RegExp(`${keyword}[\\s:]*([\\s\\S]*?)(?=\\n##|\\n###|$)`, 'i');
-    const match = text.match(regex);
-    if (match) {
-      return match[1].trim();
-    }
+  if (!text || typeof text !== 'string' || keywords.length === 0) {
+    return '';
   }
+
+  try {
+    for (const keyword of keywords) {
+      if (!keyword || typeof keyword !== 'string') continue;
+      
+      const escapedKeyword = keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const regex = new RegExp(`${escapedKeyword}[\\s:]*([\\s\\S]*?)(?=\\n##|\\n###|$)`, 'i');
+      const match = text.match(regex);
+      if (match && match[1]) {
+        return match[1].trim();
+      }
+    }
+  } catch (error) {
+    logger.warn('Erro ao extrair seção', { keywords, error });
+  }
+  
   return '';
 };
 
