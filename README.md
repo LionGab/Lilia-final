@@ -60,7 +60,7 @@ O aplicativo estará disponível em `http://localhost:3000`
 
 ### Modo ERL (Padrão)
 
-A LIA ajuda você a:
+A Lyla.IA ajuda você a:
 
 1. Definir seu produto principal
 2. Criar um funil URL (Entrada → Relacionamento → Lucro)

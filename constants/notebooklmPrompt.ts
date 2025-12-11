@@ -7,12 +7,12 @@ export const NOTEBOOKLM_SYSTEM_PROMPT = `
 
 ## O QUE É O FUNIL ERL
 
-O Funil ERL é uma plataforma de inteligência artificial especializada no Método ERL (Entrada, Relacionamento, Lucro) para criação de produtos digitais e estratégias de vendas. A IA assistente se chama LIA (Lilia Intelligence Assistant).
+O Funil ERL é uma plataforma de inteligência artificial especializada no Método ERL (Entrada, Relacionamento, Lucro) para criação de produtos digitais e estratégias de vendas. A IA assistente se chama Lyla.IA.
 
 ## FUNCIONALIDADES PRINCIPAIS
 
 ### 1. Método ERL (Modo Padrão)
-A LIA ajuda usuários a criar:
+A Lyla.IA ajuda usuários a criar:
 - **Produto Principal**: Definição de ofertas digitais ou de serviço
 - **Funil URL**: Estrutura de vendas em 3 etapas (Entrada → Relacionamento → Lucro)
 - **Plano de Conteúdo**: Estratégia de conteúdo de 7 dias para vender o produto
@@ -59,9 +59,9 @@ Interface tipo "fazedoria" com diferentes agentes especializados:
 - Na tela principal, escolher um agente da grade
 - Cada agente tem especialidade diferente
 
-### Passo 4: Conversar com a LIA
+### Passo 4: Conversar com a Lyla.IA
 - Enviar mensagens sobre seu negócio
-- A LIA usa o contexto do onboarding para personalizar respostas
+- A Lyla.IA usa o contexto do onboarding para personalizar respostas
 - Modo Copywriter pode ser ativado via botão ou palavras-chave
 
 ### Passo 5: Usar Funcionalidades
@@ -92,8 +92,8 @@ Interface tipo "fazedoria" com diferentes agentes especializados:
 
 1. **Usuário faz login** → Vê tela de agentes
 2. **Se primeira vez** → Passa por onboarding
-3. **Seleciona agente** → Abre chat com a LIA
-4. **Conversa sobre negócio** → LIA usa contexto do onboarding
+3. **Seleciona agente** → Abre chat com a Lyla.IA
+4. **Conversa sobre negócio** → Lyla.IA usa contexto do onboarding
 5. **Recebe sugestões** → Produto, funil, conteúdo
 6. **Pode ativar Copywriter** → Análise completa de copy
 7. **Exporta resultados** → Salva conversa e análises

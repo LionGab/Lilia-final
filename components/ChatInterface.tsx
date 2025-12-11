@@ -108,7 +108,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
   const initializeWelcomeMessage = (useOnboarding: boolean = true) => {
     // Criar mensagem de boas-vindas personalizada baseada no onboarding
     const data = useOnboarding ? onboardingData : undefined;
-    let welcomeText = "Olá! Eu sou a LIA, sua mentora de negócios digitais com o Método ERL.\n\n";
+    let welcomeText = "Olá! Eu sou a Lyla.IA, sua mentora de negócios digitais com o Método ERL.\n\n";
     
     if (data?.profissao || data?.habilidadePrincipal) {
       welcomeText += "Vou te ajudar a estruturar seu produto, seu funil e seu conteúdo.\n\n";
@@ -550,7 +550,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
               value={inputText}
               onChange={handleInputResize}
               onKeyDown={handleKeyDown}
-              placeholder={selectedImage ? "Descreva a imagem..." : audioPreviewUrl ? "Adicione uma mensagem (opcional)..." : "Mensagem para a LIA..."}
+              placeholder={selectedImage ? "Descreva a imagem..." : audioPreviewUrl ? "Adicione uma mensagem (opcional)..." : "Mensagem para a Lyla.IA..."}
               className="flex-1 bg-transparent border-none focus:ring-0 text-slate-800 dark:text-slate-200 placeholder-slate-400 dark:placeholder-slate-500 resize-none max-h-32 py-2 px-2 text-sm sm:text-base leading-relaxed"
               rows={1}
               disabled={isLoading}

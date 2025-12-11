@@ -27,7 +27,7 @@ export const exportToMarkdown = (messages: Message[]): string => {
   markdown += '---\n\n';
   
   messages.forEach((msg, index) => {
-    const sender = msg.sender === 'user' ? '**Usuário**' : '**LIA**';
+    const sender = msg.sender === 'user' ? '**Usuário**' : '**Lyla.IA**';
     const timestamp = new Date(msg.timestamp).toLocaleString('pt-BR');
     
     markdown += `## Mensagem ${index + 1}\n\n`;

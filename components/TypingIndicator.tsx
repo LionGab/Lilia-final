@@ -7,7 +7,7 @@ const TypingIndicator: React.FC = () => {
         <div className="w-2 h-2 bg-brand-400 dark:bg-brand-500 rounded-full animate-bounce [animation-delay:-0.3s]"></div>
         <div className="w-2 h-2 bg-brand-400 dark:bg-brand-500 rounded-full animate-bounce [animation-delay:-0.15s]"></div>
         <div className="w-2 h-2 bg-brand-400 dark:bg-brand-500 rounded-full animate-bounce"></div>
-        <span className="ml-2 text-xs text-slate-400 dark:text-slate-500 font-medium">LIA pensando...</span>
+        <span className="ml-2 text-xs text-slate-400 dark:text-slate-500 font-medium">Lyla.IA pensando...</span>
       </div>
     </div>
   );

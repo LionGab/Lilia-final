@@ -93,7 +93,7 @@ Após o deploy, verifique:
 
 - ✅ Site está acessível
 - ✅ Login funciona
-- ✅ Chat com LIA funciona (verifique se `GEMINI_API_KEY` está configurada)
+- ✅ Chat com Lyla.IA funciona (verifique se `GEMINI_API_KEY` está configurada)
 - ✅ Tema claro/escuro funciona
 - ✅ Tutoriais e Indicações carregam
 

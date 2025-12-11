@@ -32,7 +32,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onBack, onViewConversations }) 
         <div className="w-10 h-10 rounded-lg overflow-hidden flex items-center justify-center bg-white dark:bg-slate-800 flex-shrink-0">
           <img 
             src="/images/logo-main.jpg" 
-            alt="LIA Logo" 
+            alt="Lyla.IA Logo" 
             className="w-full h-full object-cover"
             onError={(e) => {
               // Fallback se a imagem não carregar
@@ -43,7 +43,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onBack, onViewConversations }) 
           />
         </div>
         <div>
-          <h1 className="font-semibold text-slate-900 dark:text-white text-base leading-tight">LIA</h1>
+          <h1 className="font-semibold text-slate-900 dark:text-white text-base leading-tight">Lyla.IA</h1>
           <p className="text-xs text-slate-500 dark:text-slate-400">Mentora de Negócios</p>
         </div>
       </div>

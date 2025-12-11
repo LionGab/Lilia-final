@@ -13,7 +13,7 @@ export interface Agent {
 export const AGENTS: Agent[] = [
   {
     id: 'lia-erl',
-    name: 'LIA',
+    name: 'Lyla.IA',
     title: 'Mentora de Negócios - Método ERL',
     description: 'Ajuda a estruturar produtos, funis URL e planos de conteúdo de 7 dias',
     icon: '🎯',

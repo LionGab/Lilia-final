@@ -388,7 +388,7 @@ const PersonalizationPanel: React.FC<PersonalizationPanelProps> = ({ onBack }) =
               className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-400 focus:border-brand-500 dark:focus:border-brand-400 outline-none transition-all text-slate-800 dark:text-white bg-white dark:bg-slate-800 resize-none"
             />
             <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
-              Descreva como você quer que a LIA responda você. Essas preferências serão aplicadas em todas as conversas.
+              Descreva como você quer que a Lyla.IA responda você. Essas preferências serão aplicadas em todas as conversas.
             </p>
           </div>
 

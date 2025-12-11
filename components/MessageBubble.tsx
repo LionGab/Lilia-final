@@ -49,7 +49,7 @@ const MessageBubble: React.FC<MessageBubbleProps> = ({ message }) => {
         <div className="flex-none w-8 h-8 rounded-full overflow-hidden bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center mt-1 flex-shrink-0">
           <img 
             src="/images/logo-main.jpg" 
-            alt="LIA" 
+            alt="Lyla.IA" 
             className="w-full h-full object-cover"
             onError={(e) => {
               // Fallback se a imagem não carregar

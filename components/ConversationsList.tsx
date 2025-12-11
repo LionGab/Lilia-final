@@ -95,7 +95,7 @@ const ConversationsList: React.FC<ConversationsListProps> = ({
               Nenhuma conversa ainda
             </h3>
             <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-              Comece uma nova conversa para começar a usar a LIA
+              Comece uma nova conversa para começar a usar a Lyla.IA
             </p>
             <button
               onClick={onCreateNew}
@@ -119,7 +119,7 @@ const ConversationsList: React.FC<ConversationsListProps> = ({
                   <div className="flex-none w-10 h-10 rounded-full overflow-hidden bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center flex-shrink-0">
                     <img 
                       src="/images/logo-main.jpg" 
-                      alt="LIA" 
+                      alt="Lyla.IA" 
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;

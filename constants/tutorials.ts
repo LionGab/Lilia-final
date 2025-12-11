@@ -52,7 +52,7 @@ Na primeira vez que entrar, você verá uma tela de configuração:
 
 ## 4. Começar a Conversar
 - Digite sua mensagem na caixa de texto
-- A LIA usará o contexto do onboarding para personalizar as respostas
+- A Lyla.IA usará o contexto do onboarding para personalizar as respostas
 - Você pode anexar imagens clicando no ícone de imagem
     `,
     steps: [
@@ -80,27 +80,27 @@ Um sistema simples para criar produtos digitais e funis de venda.
 ## Como Funciona no App
 
 ### Bloco 1: Diagnóstico Rápido
-A LIA faz perguntas mínimas e essenciais:
+A Lyla.IA faz perguntas mínimas e essenciais:
 - Qual sua profissão/área?
 - O que você já oferece?
 - Qual seu público-alvo?
 
-**Dica**: Se você completou o onboarding, a LIA já tem essas informações!
+**Dica**: Se você completou o onboarding, a Lyla.IA já tem essas informações!
 
 ### Bloco 2: Produto Principal
-A LIA sugere 3 opções de produto baseadas no seu contexto:
+A Lyla.IA sugere 3 opções de produto baseadas no seu contexto:
 - Produtos digitais (cursos, ebooks, templates)
 - Serviços (consultoria, mentoria, coaching)
 - Híbridos (programa + comunidade)
 
-**Exemplo de resposta da LIA**:
+**Exemplo de resposta da Lyla.IA**:
 "Baseado no seu perfil, sugiro estas 3 opções:
 1. Curso Online de [tema]
 2. Mentoria em Grupo
 3. Consultoria 1:1"
 
 ### Bloco 3: Funil URL
-A LIA cria um mapa completo do funil:
+A Lyla.IA cria um mapa completo do funil:
 
 **ENTRADA** (Como atrair):
 - Conteúdo gratuito
@@ -118,7 +118,7 @@ A LIA cria um mapa completo do funil:
 - Comunidade premium
 
 ### Bloco 4: Plano de Conteúdo
-A LIA monta um plano de 7 dias:
+A Lyla.IA monta um plano de 7 dias:
 - Dia 1: Post sobre problema
 - Dia 2: Storytelling pessoal
 - Dia 3: Dica prática
@@ -127,7 +127,7 @@ A LIA monta um plano de 7 dias:
 ## Dicas para Melhores Resultados
 
 1. **Seja específico**: Quanto mais detalhes, melhor a sugestão
-2. **Use o contexto**: A LIA lembra do onboarding
+2. **Use o contexto**: A Lyla.IA lembra do onboarding
 3. **Peça ajustes**: "E se fosse um curso gravado?" funciona
 4. **Exporte**: Salve o plano em Markdown ou PDF
     `
@@ -158,7 +158,7 @@ Envie mensagens com:
 - "texto de venda"
 - "copywriting"
 
-A LIA detecta automaticamente e ativa o modo.
+A Lyla.IA detecta automaticamente e ativa o modo.
 
 ## Os 10 Passos do Copywriter
 
@@ -220,7 +220,7 @@ A LIA detecta automaticamente e ativa o modo.
 
 **Você**: "Quero criar um curso de marketing digital"
 
-**LIA (Modo Copywriter)**: 
+**Lyla.IA (Modo Copywriter)**: 
 Gera análise completa com:
 - Público-alvo definido
 - Estrutura de copy (ex: AIDA)
@@ -321,7 +321,7 @@ Adicione no onboarding:
 - "Sempre me dê exemplos práticos"
 - "Fale como se eu fosse iniciante"
 
-A LIA seguirá essas preferências!
+A Lyla.IA seguirá essas preferências!
     `
   },
   {
@@ -394,7 +394,7 @@ Arquivo não é baixado.
 - Tente outro formato
 - Verifique se há mensagens na conversa
 
-## LIA Não Responde
+## Lyla.IA Não Responde
 
 ### Problema
 A IA não está respondendo.

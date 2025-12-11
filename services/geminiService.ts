@@ -371,6 +371,6 @@ export const sendContentToGemini = async (
       throw error;
     }
     
-    throw new Error("Falha ao conectar com a LIA. Verifique sua conexão ou tente novamente.");
+    throw new Error("Falha ao conectar com a Lyla.IA. Verifique sua conexão ou tente novamente.");
   });
 };
