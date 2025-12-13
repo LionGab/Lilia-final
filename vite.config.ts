@@ -5,12 +5,12 @@ import react from '@vitejs/plugin-react';
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
 
-    // API Keys
-    const geminiApiKey = env.VITE_GEMINI_API_KEY || env.GEMINI_API_KEY || '';
+    // API Keys (Vite expõe automaticamente variáveis com prefixo VITE_)
+    const geminiApiKey = env.VITE_GEMINI_API_KEY || '';
 
     // Supabase
-    const supabaseUrl = env.VITE_SUPABASE_URL || env.SUPABASE_URL || '';
-    const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY || env.SUPABASE_ANON_KEY || '';
+    const supabaseUrl = env.VITE_SUPABASE_URL || '';
+    const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY || '';
 
     return {
       server: {
