@@ -4,8 +4,14 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
-    const geminiApiKey = env.GEMINI_API_KEY || '';
-    
+
+    // API Keys
+    const geminiApiKey = env.VITE_GEMINI_API_KEY || env.GEMINI_API_KEY || '';
+
+    // Supabase
+    const supabaseUrl = env.VITE_SUPABASE_URL || env.SUPABASE_URL || '';
+    const supabaseAnonKey = env.VITE_SUPABASE_ANON_KEY || env.SUPABASE_ANON_KEY || '';
+
     return {
       server: {
         port: 3000,
@@ -13,10 +19,16 @@ export default defineConfig(({ mode }) => {
       },
       plugins: [react()],
       define: {
+        // Gemini API
         'process.env.API_KEY': JSON.stringify(geminiApiKey),
         'process.env.GEMINI_API_KEY': JSON.stringify(geminiApiKey),
-        // Também disponibilizar via window para fallback
         'window.__GEMINI_API_KEY__': JSON.stringify(geminiApiKey),
+
+        // Supabase
+        'process.env.SUPABASE_URL': JSON.stringify(supabaseUrl),
+        'process.env.SUPABASE_ANON_KEY': JSON.stringify(supabaseAnonKey),
+        'window.__SUPABASE_URL__': JSON.stringify(supabaseUrl),
+        'window.__SUPABASE_ANON_KEY__': JSON.stringify(supabaseAnonKey),
       },
       resolve: {
         alias: {
