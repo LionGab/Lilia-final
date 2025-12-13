@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { AGENTS, CATEGORIES, Agent } from '../types/agents';
 import { getCurrentUser } from '../services/authService';
-import { groupConversationsBySession } from '../services/historyService';
+import { getAllThreads, Thread } from '../services/threadService';
 import { Message } from '../types';
 import { initTheme } from '../services/themeService';
 import ThemeToggle from './ThemeToggle';
@@ -16,6 +16,7 @@ interface AgentsScreenProps {
 
 const AgentsScreen: React.FC<AgentsScreenProps> = ({ onSelectAgent, onViewHistory, onViewTutorials, onViewIdeas, onViewPersonalization }) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('todos');
+  const [threads, setThreads] = useState<ReturnType<typeof getAllThreads>>([]);
   // Mobile-first: sidebar fechado por padrão no mobile, aberto no desktop
   const [showSidebar, setShowSidebar] = useState(() => {
     if (typeof window !== 'undefined') {
@@ -28,6 +29,18 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({ onSelectAgent, onViewHistor
   useEffect(() => {
     initTheme();
     
+    // Carregar threads
+    const loadThreads = () => {
+      setThreads(getAllThreads());
+    };
+    
+    loadThreads();
+    
+    // Atualizar threads periodicamente e quando a janela recebe foco
+    const interval = setInterval(loadThreads, 2000);
+    const handleFocus = () => loadThreads();
+    window.addEventListener('focus', handleFocus);
+    
     // Ajustar sidebar quando redimensionar
     const handleResize = () => {
       if (window.innerWidth >= 768) {
@@ -36,26 +49,13 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({ onSelectAgent, onViewHistor
     };
     
     window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('focus', handleFocus);
+      window.removeEventListener('resize', handleResize);
+    };
   }, []);
-
-  // Carregar histórico do localStorage
-  const loadHistory = (): Message[] => {
-    if (!user) return [];
-    const storageKey = `erl_lia_chat_history_${user.email}`;
-    const savedHistory = localStorage.getItem(storageKey);
-    if (savedHistory) {
-      try {
-        return JSON.parse(savedHistory);
-      } catch {
-        return [];
-      }
-    }
-    return [];
-  };
-
-  const messages = loadHistory();
-  const sessions = groupConversationsBySession(messages);
 
   const filteredAgents = selectedCategory === 'todos'
     ? AGENTS.filter(a => a.enabled)
@@ -152,27 +152,30 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({ onSelectAgent, onViewHistor
           <div className="flex-1 overflow-y-auto p-3 border-t border-slate-200 dark:border-slate-700 min-h-0">
             <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 px-2 uppercase tracking-wide">Histórico</h3>
             <div className="space-y-1">
-              {sessions.length === 0 ? (
+              {threads.length === 0 ? (
                 <p className="text-xs text-slate-400 dark:text-slate-500 px-2 py-4 text-center">
                   Nenhuma conversa ainda
                 </p>
               ) : (
                 <>
-                  {sessions.slice(0, 8).map((session) => (
-                    <div
-                      key={session.id}
-                      className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors group"
-                      onClick={() => onViewHistory(session.id)}
-                    >
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1 min-w-0">
-                          <p className="text-xs text-slate-700 dark:text-slate-300 truncate">{session.summary}</p>
-                          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{session.date}</p>
+                  {threads.slice(0, 8).map((thread) => {
+                    const date = new Date(thread.lastMessageTime).toLocaleDateString('pt-BR');
+                    return (
+                      <div
+                        key={thread.id}
+                        className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors group"
+                        onClick={() => onViewHistory(thread.id)}
+                      >
+                        <div className="flex items-start justify-between">
+                          <div className="flex-1 min-w-0">
+                            <p className="text-xs text-slate-700 dark:text-slate-300 truncate">{thread.title}</p>
+                            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{date}</p>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                  {sessions.length > 8 && (
+                    );
+                  })}
+                  {threads.length > 8 && (
                     <button className="w-full text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-center py-2">
                       Carregar mais →
                     </button>

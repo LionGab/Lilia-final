@@ -79,8 +79,13 @@ const App: React.FC = () => {
     setCurrentThreadId(null);
   };
 
-  const handleViewConversations = () => {
-    setCurrentView('conversations');
+  const handleViewConversations = (threadId?: string) => {
+    if (threadId) {
+      setCurrentThreadId(threadId);
+      setCurrentView('chat');
+    } else {
+      setCurrentView('conversations');
+    }
   };
 
   const handleSelectThread = (threadId: string) => {
