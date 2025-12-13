@@ -1,8 +1,43 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { OnboardingData } from '../types/onboarding';
 import { BUSINESS_TEMPLATES, RESPONSE_STYLES, BusinessTemplate } from '../constants/businessTemplates';
 import { getCurrentUser } from '../services/authService';
 import { initTheme } from '../services/themeService';
+import { logger } from '../services/logger';
+
+type SpeechRecognitionAlternativeLike = {
+  transcript: string;
+};
+
+type SpeechRecognitionResultLike = {
+  isFinal: boolean;
+  0: SpeechRecognitionAlternativeLike;
+};
+
+type SpeechRecognitionResultListLike = {
+  length: number;
+  [index: number]: SpeechRecognitionResultLike;
+};
+
+type SpeechRecognitionEventLike = {
+  resultIndex: number;
+  results: SpeechRecognitionResultListLike;
+};
+
+type SpeechRecognitionErrorLike = {
+  error: string;
+};
+
+type SpeechRecognitionLike = {
+  lang: string;
+  continuous: boolean;
+  interimResults: boolean;
+  onresult: ((event: SpeechRecognitionEventLike) => void) | null;
+  onerror: ((event: SpeechRecognitionErrorLike) => void) | null;
+  onend: (() => void) | null;
+  start: () => void;
+  stop: () => void;
+};
 
 interface OnboardingScreenProps {
   onComplete: (data: OnboardingData) => void;
@@ -16,6 +51,9 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onSkip 
   const [formData, setFormData] = useState<OnboardingData>({});
   const [observacoes, setObservacoes] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isRecording, setIsRecording] = useState(false);
+  const [isTranscribing, setIsTranscribing] = useState(false);
+  const recognitionRef = useRef<SpeechRecognitionLike | null>(null);
 
   useEffect(() => {
     initTheme();
@@ -35,10 +73,17 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onSkip 
           if (parsed.estiloResposta) setSelectedStyle(parsed.estiloResposta);
           if (parsed.observacoes) setObservacoes(parsed.observacoes);
         } catch (error) {
-          console.error('Erro ao carregar onboarding:', error);
+          logger.error('Erro ao carregar onboarding', error);
         }
       }
     }
+
+    // Cleanup: parar gravação quando componente desmontar
+    return () => {
+      if (recognitionRef.current) {
+        recognitionRef.current.stop();
+      }
+    };
   }, []);
 
   const handleTemplateSelect = (template: BusinessTemplate) => {
@@ -116,6 +161,94 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onSkip 
 
   const updateFormData = (field: keyof OnboardingData, value: any) => {
     setFormData({ ...formData, [field]: value });
+  };
+
+  // Verificar se Web Speech API está disponível
+  const isSpeechRecognitionAvailable = (): boolean => {
+    return 'webkitSpeechRecognition' in window || 'SpeechRecognition' in window;
+  };
+
+  // Iniciar transcrição de áudio
+  const handleStartRecording = () => {
+    if (!isSpeechRecognitionAvailable()) {
+      alert('Transcrição de voz não está disponível no seu navegador. Use Chrome ou Edge.');
+      return;
+    }
+
+    try {
+      const win = window as unknown as {
+        SpeechRecognition?: new () => SpeechRecognitionLike;
+        webkitSpeechRecognition?: new () => SpeechRecognitionLike;
+      };
+
+      const SpeechRecognitionCtor = win.SpeechRecognition || win.webkitSpeechRecognition;
+      if (!SpeechRecognitionCtor) {
+        alert('Transcrição de voz não está disponível no seu navegador. Use Chrome ou Edge.');
+        return;
+      }
+
+      const recognition = new SpeechRecognitionCtor();
+      
+      recognition.lang = 'pt-BR';
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      let finalTranscript = observacoes;
+
+      recognition.onresult = (event) => {
+        let interimTranscript = '';
+        
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+          const result = event.results[i];
+          const firstAlternative = result[0];
+          const transcript = (firstAlternative && typeof firstAlternative === 'object' && 'transcript' in firstAlternative) 
+            ? (firstAlternative as { transcript: string }).transcript 
+            : '';
+          if (result.isFinal) {
+            finalTranscript += transcript + ' ';
+          } else {
+            interimTranscript += transcript;
+          }
+        }
+        
+        setObservacoes(finalTranscript + interimTranscript);
+      };
+
+      recognition.onerror = (event) => {
+        logger.error('Erro na transcrição', { error: event.error });
+        if (event.error === 'no-speech') {
+          // Ignorar erro de "no-speech" - usuário pode estar apenas pensando
+          return;
+        }
+        setIsRecording(false);
+        setIsTranscribing(false);
+        alert(`Erro na transcrição: ${event.error}`);
+      };
+
+      recognition.onend = () => {
+        setIsRecording(false);
+        setIsTranscribing(false);
+      };
+
+      recognitionRef.current = recognition;
+      recognition.start();
+      setIsRecording(true);
+      setIsTranscribing(true);
+    } catch (error) {
+      logger.error('Erro ao iniciar transcrição', error);
+      alert('Erro ao iniciar transcrição de voz. Verifique as permissões do microfone.');
+      setIsRecording(false);
+      setIsTranscribing(false);
+    }
+  };
+
+  // Parar transcrição
+  const handleStopRecording = () => {
+    if (recognitionRef.current) {
+      recognitionRef.current.stop();
+      setIsRecording(false);
+      setIsTranscribing(false);
+    }
   };
 
   return (
@@ -295,13 +428,44 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onSkip 
                   <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
                     Observações adicionais (opcional)
                   </label>
-                  <textarea
-                    value={observacoes}
-                    onChange={(e) => setObservacoes(e.target.value)}
-                    placeholder="Ex: Prefiro respostas curtas, gosto de exemplos práticos, fale como se eu fosse iniciante..."
-                    rows={4}
-                    className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-400 focus:border-brand-500 dark:focus:border-brand-400 outline-none transition-all text-slate-800 dark:text-white bg-white dark:bg-slate-700 resize-none"
-                  />
+                  <div className="relative">
+                    <textarea
+                      value={observacoes}
+                      onChange={(e) => setObservacoes(e.target.value)}
+                      placeholder="Ex: Prefiro respostas curtas, gosto de exemplos práticos, fale como se eu fosse iniciante..."
+                      rows={4}
+                      className="w-full px-4 py-3 pr-12 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-400 focus:border-brand-500 dark:focus:border-brand-400 outline-none transition-all text-slate-800 dark:text-white bg-white dark:bg-slate-700 resize-none"
+                    />
+                    <button
+                      type="button"
+                      onClick={isRecording ? handleStopRecording : handleStartRecording}
+                      disabled={isTranscribing}
+                      className={`absolute right-2 top-2 p-2 rounded-lg transition-all ${
+                        isRecording
+                          ? 'bg-red-500 text-white animate-pulse'
+                          : 'bg-slate-100 dark:bg-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-500'
+                      } disabled:opacity-50 disabled:cursor-not-allowed`}
+                      aria-label={isRecording ? 'Parar gravação' : 'Gravar áudio'}
+                      title={isRecording ? 'Parar gravação' : 'Gravar áudio e transcrever automaticamente'}
+                    >
+                      {isRecording ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-5 h-5">
+                          <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                          <path d="M19 10v1c0 3.87-3.13 7-7 7s-7-3.13-7-7v-1h2v1c0 2.76 2.24 5 5 5s5-2.24 5-5v-1h2z"/>
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                        </svg>
+                      )}
+                    </button>
+                  </div>
+                  {isTranscribing && (
+                    <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                      <span className="inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                      Gravando... Fale agora
+                    </p>
+                  )}
                 </div>
               </>
             ) : (
@@ -309,13 +473,44 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onSkip 
                 <h2 className="text-xl font-semibold text-slate-800 dark:text-white mb-4">
                   Observações adicionais (opcional)
                 </h2>
-                <textarea
-                  value={observacoes}
-                  onChange={(e) => setObservacoes(e.target.value)}
-                  placeholder="Ex: Prefiro respostas curtas, gosto de exemplos práticos, fale como se eu fosse iniciante, sempre me dê números e métricas..."
-                  rows={6}
-                  className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-400 focus:border-brand-500 dark:focus:border-brand-400 outline-none transition-all text-slate-800 dark:text-white bg-white dark:bg-slate-700 resize-none"
-                />
+                <div className="relative">
+                  <textarea
+                    value={observacoes}
+                    onChange={(e) => setObservacoes(e.target.value)}
+                    placeholder="Ex: Prefiro respostas curtas, gosto de exemplos práticos, fale como se eu fosse iniciante, sempre me dê números e métricas..."
+                    rows={6}
+                    className="w-full px-4 py-3 pr-12 border border-slate-300 dark:border-slate-600 rounded-lg focus:ring-2 focus:ring-brand-500 dark:focus:ring-brand-400 focus:border-brand-500 dark:focus:border-brand-400 outline-none transition-all text-slate-800 dark:text-white bg-white dark:bg-slate-700 resize-none"
+                  />
+                  <button
+                    type="button"
+                    onClick={isRecording ? handleStopRecording : handleStartRecording}
+                    disabled={isTranscribing}
+                    className={`absolute right-2 top-2 p-2 rounded-lg transition-all ${
+                      isRecording
+                        ? 'bg-red-500 text-white animate-pulse'
+                        : 'bg-slate-100 dark:bg-slate-600 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-500'
+                    } disabled:opacity-50 disabled:cursor-not-allowed`}
+                    aria-label={isRecording ? 'Parar gravação' : 'Gravar áudio'}
+                    title={isRecording ? 'Parar gravação' : 'Gravar áudio e transcrever automaticamente'}
+                  >
+                    {isRecording ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 24 24" className="w-5 h-5">
+                        <path d="M12 14c1.66 0 3-1.34 3-3V5c0-1.66-1.34-3-3-3S9 3.34 9 5v6c0 1.66 1.34 3 3 3z"/>
+                        <path d="M19 10v1c0 3.87-3.13 7-7 7s-7-3.13-7-7v-1h2v1c0 2.76 2.24 5 5 5s5-2.24 5-5v-1h2z"/>
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={2} stroke="currentColor" className="w-5 h-5">
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 18.75a6 6 0 006-6v-1.5m-6 7.5a6 6 0 01-6-6v-1.5m6 7.5v3.75m-3.75 0h7.5M12 15.75a3 3 0 01-3-3V4.5a3 3 0 116 0v8.25a3 3 0 01-3 3z" />
+                      </svg>
+                    )}
+                  </button>
+                </div>
+                {isTranscribing && (
+                  <p className="mt-2 text-xs text-slate-500 dark:text-slate-400 flex items-center gap-1">
+                    <span className="inline-block w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                    Gravando... Fale agora
+                  </p>
+                )}
               </>
             )}
           </div>
