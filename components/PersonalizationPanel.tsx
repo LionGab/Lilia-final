@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { OnboardingData } from '../types/onboarding';
 import { BUSINESS_TEMPLATES, RESPONSE_STYLES, BusinessTemplate } from '../constants/businessTemplates';
 import { getCurrentUser } from '../services/authService';
+import { logger } from '../services/logger';
 
 interface PersonalizationPanelProps {
   onBack?: () => void;
@@ -32,7 +33,7 @@ const PersonalizationPanel: React.FC<PersonalizationPanelProps> = ({ onBack }) =
             if (template) setSelectedTemplate(template);
           }
         } catch (error) {
-          console.error('Erro ao carregar dados:', error);
+          logger.error('Erro ao carregar dados de personalização', error);
         }
       }
     }
@@ -81,7 +82,7 @@ const PersonalizationPanel: React.FC<PersonalizationPanelProps> = ({ onBack }) =
       setTimeout(() => setSaveMessage(null), 3000);
     } catch (error) {
       setSaveMessage('Erro ao salvar configurações');
-      console.error('Erro ao salvar:', error);
+      logger.error('Erro ao salvar configurações de personalização', error);
     } finally {
       setIsSaving(false);
     }

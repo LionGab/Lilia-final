@@ -1,5 +1,6 @@
 import { User } from '../types/auth';
 import { ALLOWED_EMAILS } from '../constants/auth';
+import { logger } from './logger';
 
 const AUTH_STORAGE_KEY = 'erl_auth_user';
 
@@ -30,7 +31,7 @@ export const login = (email: string): boolean => {
     localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
     return true;
   } catch (error) {
-    console.error('Erro ao salvar dados de autenticação:', error);
+    logger.error('Erro ao salvar dados de autenticação', error);
     return false;
   }
 };
@@ -42,7 +43,7 @@ export const logout = (): void => {
   try {
     localStorage.removeItem(AUTH_STORAGE_KEY);
   } catch (error) {
-    console.error('Erro ao fazer logout:', error);
+    logger.error('Erro ao fazer logout', error);
   }
 };
 
@@ -66,7 +67,7 @@ export const getCurrentUser = (): User | null => {
 
     return user;
   } catch (error) {
-    console.error('Erro ao ler dados de autenticação:', error);
+    logger.error('Erro ao ler dados de autenticação', error);
     logout();
     return null;
   }

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Message } from '../types';
 import { exportToMarkdown, exportToJSON, exportToPDF, structureFinalData } from '../services/exportService';
+import { logger } from '../services/logger';
 
 interface ExportButtonProps {
   messages: Message[];
@@ -16,14 +17,12 @@ const ExportButton: React.FC<ExportButtonProps> = ({ messages }) => {
     try {
       let blob: Blob;
       let filename: string;
-      let mimeType: string;
       
       switch (format) {
         case 'markdown':
           const markdown = exportToMarkdown(messages);
           blob = new Blob([markdown], { type: 'text/markdown' });
           filename = `conversa-${Date.now()}.md`;
-          mimeType = 'text/markdown';
           break;
           
         case 'json':
@@ -31,14 +30,12 @@ const ExportButton: React.FC<ExportButtonProps> = ({ messages }) => {
           const json = exportToJSON(data);
           blob = new Blob([json], { type: 'application/json' });
           filename = `conversa-${Date.now()}.json`;
-          mimeType = 'application/json';
           break;
           
         case 'pdf':
           const dataForPdf = structureFinalData(messages);
           blob = await exportToPDF(dataForPdf);
           filename = `conversa-${Date.now()}.txt`; // Fallback para txt já que PDF real requer biblioteca
-          mimeType = 'text/plain';
           break;
       }
       
@@ -51,7 +48,7 @@ const ExportButton: React.FC<ExportButtonProps> = ({ messages }) => {
       
       setIsOpen(false);
     } catch (error) {
-      console.error('Erro ao exportar:', error);
+      logger.error('Erro ao exportar', error);
       alert('Erro ao exportar. Tente novamente.');
     } finally {
       setIsExporting(false);

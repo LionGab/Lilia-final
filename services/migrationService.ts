@@ -1,4 +1,5 @@
 import { getCurrentUser } from './authService';
+import { logger } from './logger';
 
 const OLD_STORAGE_KEY = 'erl_lia_chat_history_v1';
 const OLD_ONBOARDING_KEY = 'erl_lia_onboarding';
@@ -22,7 +23,7 @@ export const migrateOldData = (): void => {
       if (!localStorage.getItem(newKey)) {
         localStorage.setItem(newKey, oldHistory);
         // Não remover o antigo imediatamente para segurança
-        console.log('Histórico migrado para estrutura por usuário');
+        logger.info('Histórico migrado para estrutura por usuário');
       }
     }
 
@@ -32,11 +33,11 @@ export const migrateOldData = (): void => {
       const newKey = `erl_lia_onboarding_${userId}`;
       if (!localStorage.getItem(newKey)) {
         localStorage.setItem(newKey, oldOnboarding);
-        console.log('Onboarding migrado para estrutura por usuário');
+        logger.info('Onboarding migrado para estrutura por usuário');
       }
     }
   } catch (error) {
-    console.error('Erro ao migrar dados:', error);
+    logger.error('Erro ao migrar dados', error);
   }
 };
 
@@ -50,10 +51,10 @@ export const cleanupOldData = (): void => {
     if (user) {
       // Aguardar alguns dias antes de limpar (opcional)
       // Por enquanto, manter os dados antigos como backup
-      console.log('Dados antigos mantidos como backup');
+      logger.info('Dados antigos mantidos como backup');
     }
   } catch (error) {
-    console.error('Erro ao limpar dados antigos:', error);
+    logger.error('Erro ao limpar dados antigos', error);
   }
 };
 

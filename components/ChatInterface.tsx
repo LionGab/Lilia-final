@@ -9,6 +9,7 @@ import { checkAndMigrate } from '../services/migrationService';
 import { initTheme } from '../services/themeService';
 import { OnboardingData } from '../types/onboarding';
 import { getThreadMessages, saveThreadMessages, createThread } from '../services/threadService';
+import { logger } from '../services/logger';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 import ChatHeader from './ChatHeader';
@@ -71,7 +72,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
           const parsed = JSON.parse(savedOnboarding);
           setOnboardingData(parsed);
         } catch (error) {
-          console.error("Failed to parse onboarding data:", error);
+          logger.error('Falha ao parsear onboarding do localStorage', error);
         }
       }
     }
@@ -219,10 +220,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
         setCopywriterResponse(null); // Clear copywriter response in normal mode
       }
     } catch (error) {
-      // Log detalhado apenas em desenvolvimento
-      if (typeof window !== 'undefined' && window.location.hostname === 'localhost') {
-        console.error("Erro ao enviar mensagem:", error);
-      }
+      logger.error('Erro ao enviar mensagem', error);
       
       // Mensagem de erro amigável
       let errorText = "Poxa, tive um probleminha para processar sua mensagem agora.";
@@ -309,7 +307,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
       recorder.start();
       setIsRecording(true);
     } catch (error) {
-      console.error('Erro ao iniciar gravação:', error);
+      logger.error('Erro ao iniciar gravação de áudio', error);
       alert('Não foi possível acessar o microfone. Verifique as permissões.');
     }
   };
