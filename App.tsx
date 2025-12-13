@@ -118,7 +118,7 @@ const App: React.FC = () => {
   // Mostrar loading enquanto verifica autenticação
   if (isChecking) {
     return (
-      <div className="min-h-screen bg-slate-100 dark:bg-slate-900 flex items-center justify-center transition-colors">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center transition-colors">
         <div className="text-slate-500 dark:text-slate-400">Carregando...</div>
       </div>
     );
@@ -137,8 +137,8 @@ const App: React.FC = () => {
   // Renderizar diferentes views
   if (currentView === 'tutorials') {
     return (
-      <div className="min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors">
-        <div className="h-screen">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 transition-colors">
+        <div className="h-screen w-full">
           <TutorialsPanel onBack={handleBackToAgents} />
         </div>
       </div>
@@ -147,8 +147,8 @@ const App: React.FC = () => {
 
   if (currentView === 'ideas') {
     return (
-      <div className="min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors">
-        <div className="h-screen">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 transition-colors">
+        <div className="h-screen w-full">
           <BusinessIdeasPanel onBack={handleBackToAgents} />
         </div>
       </div>
@@ -157,8 +157,8 @@ const App: React.FC = () => {
 
   if (currentView === 'personalization') {
     return (
-      <div className="min-h-screen bg-slate-100 dark:bg-slate-900 transition-colors">
-        <div className="h-screen">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 transition-colors">
+        <div className="h-screen w-full">
           <PersonalizationPanel onBack={handleBackToAgents} />
         </div>
       </div>
@@ -167,13 +167,15 @@ const App: React.FC = () => {
 
   if (currentView === 'agents') {
     return (
-      <AgentsScreen 
-        onSelectAgent={handleSelectAgent} 
-        onViewHistory={handleViewConversations}
-        onViewTutorials={handleViewTutorials}
-        onViewIdeas={handleViewIdeas}
-        onViewPersonalization={handleViewPersonalization}
-      />
+      <div className="w-full h-screen">
+        <AgentsScreen 
+          onSelectAgent={handleSelectAgent} 
+          onViewHistory={handleViewConversations}
+          onViewTutorials={handleViewTutorials}
+          onViewIdeas={handleViewIdeas}
+          onViewPersonalization={handleViewPersonalization}
+        />
+      </div>
     );
   }
 
@@ -192,7 +194,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900 transition-colors">
+    <div className="min-h-screen w-full bg-white dark:bg-slate-900 transition-colors">
       <ChatInterface 
         agentId={selectedAgent} 
         onBack={handleBackToAgents}

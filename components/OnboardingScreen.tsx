@@ -119,7 +119,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onSkip 
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 dark:from-slate-900 to-slate-200 dark:to-slate-800 flex items-center justify-center p-3 sm:p-4 transition-colors safe-area-inset overflow-y-auto py-6">
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 dark:from-slate-900 to-slate-200 dark:to-slate-800 flex items-center justify-center p-3 sm:p-4 transition-colors overflow-y-auto py-6">
       <div className="w-full max-w-4xl bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-4 sm:p-6 lg:p-8 transition-colors my-auto">
         {/* Header */}
         <div className="text-center mb-8">

@@ -53,7 +53,7 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-100 dark:from-slate-900 to-slate-200 dark:to-slate-800 flex items-center justify-center p-4 sm:p-6 transition-colors safe-area-inset">
+    <div className="min-h-screen w-full bg-gradient-to-br from-slate-50 dark:from-slate-900 to-slate-200 dark:to-slate-800 flex items-center justify-center p-4 sm:p-6 transition-colors">
       <div className="w-full max-w-md bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 sm:p-8 transition-colors">
         <div className="text-center mb-8">
           <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-tr from-brand-500 to-purple-500 flex items-center justify-center shadow-lg mx-auto mb-4">

@@ -63,7 +63,7 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({ onSelectAgent, onViewHistor
   };
 
   return (
-    <div className="flex h-screen bg-white dark:bg-slate-900 text-slate-900 dark:text-white overflow-hidden transition-colors">
+    <div className="flex h-screen w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white overflow-hidden transition-colors">
       {/* Overlay mobile */}
       {showSidebar && (
         <div 
@@ -73,7 +73,7 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({ onSelectAgent, onViewHistor
       )}
       
       {/* Sidebar - Mobile drawer */}
-      <aside className={`fixed md:static inset-y-0 left-0 w-72 sm:w-64 bg-slate-50 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col transition-transform duration-300 ease-in-out z-50 md:z-auto ${showSidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
+      <aside className={`fixed md:static inset-y-0 left-0 w-72 sm:w-64 bg-slate-50 dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex flex-col transition-transform duration-300 ease-in-out z-50 md:z-auto flex-shrink-0 ${showSidebar ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
           {/* Logo */}
           <div className="p-4 sm:p-6 border-b border-slate-200 dark:border-slate-700 flex items-center gap-3">
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg overflow-hidden flex-shrink-0">
@@ -133,27 +133,35 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({ onSelectAgent, onViewHistor
           </nav>
 
           {/* History */}
-          <div className="flex-1 overflow-y-auto p-3 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex-1 overflow-y-auto p-3 border-t border-slate-200 dark:border-slate-700 min-h-0">
             <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2 px-2 uppercase tracking-wide">Histórico</h3>
             <div className="space-y-1">
-              {sessions.slice(0, 8).map((session) => (
-                <div
-                  key={session.id}
-                  className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors group"
-                  onClick={() => onViewHistory(session.id)}
-                >
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-slate-700 dark:text-slate-300 truncate">{session.summary}</p>
-                      <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{session.date}</p>
+              {sessions.length === 0 ? (
+                <p className="text-xs text-slate-400 dark:text-slate-500 px-2 py-4 text-center">
+                  Nenhuma conversa ainda
+                </p>
+              ) : (
+                <>
+                  {sessions.slice(0, 8).map((session) => (
+                    <div
+                      key={session.id}
+                      className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 cursor-pointer transition-colors group"
+                      onClick={() => onViewHistory(session.id)}
+                    >
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1 min-w-0">
+                          <p className="text-xs text-slate-700 dark:text-slate-300 truncate">{session.summary}</p>
+                          <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">{session.date}</p>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
-              {sessions.length > 8 && (
-                <button className="w-full text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-center py-2">
-                  Carregar mais →
-                </button>
+                  ))}
+                  {sessions.length > 8 && (
+                    <button className="w-full text-xs text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-center py-2">
+                      Carregar mais →
+                    </button>
+                  )}
+                </>
               )}
             </div>
           </div>
@@ -174,7 +182,7 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({ onSelectAgent, onViewHistor
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-slate-900 transition-colors">
+      <main className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-slate-900 transition-colors min-w-0">
         {/* Header */}
         <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between transition-colors">
           <div className="flex items-center gap-2 sm:gap-3">
@@ -210,8 +218,13 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({ onSelectAgent, onViewHistor
         </div>
 
         {/* Agents Grid */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-6 bg-slate-50 dark:bg-slate-900 transition-colors overscroll-contain">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 max-w-7xl mx-auto">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6 bg-slate-50 dark:bg-slate-900 transition-colors overscroll-contain min-h-0">
+          {filteredAgents.length === 0 ? (
+            <div className="flex items-center justify-center h-full">
+              <p className="text-slate-500 dark:text-slate-400">Nenhum agente encontrado</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 max-w-7xl mx-auto w-full">
             {filteredAgents.map((agent) => (
               <div
                 key={agent.id}
@@ -244,7 +257,8 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({ onSelectAgent, onViewHistor
                 </div>
               </div>
             ))}
-          </div>
+            </div>
+          )}
         </div>
       </main>
     </div>

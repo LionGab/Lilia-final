@@ -63,7 +63,7 @@ const ConversationsList: React.FC<ConversationsListProps> = ({
   const user = getCurrentUser();
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-slate-900 transition-colors">
+    <div className="flex flex-col h-screen w-full bg-white dark:bg-slate-900 transition-colors">
       {/* Header */}
       <header className="flex-none bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-4 py-3 flex items-center justify-between">
         <h1 className="text-lg font-semibold text-slate-900 dark:text-white">Conversas</h1>

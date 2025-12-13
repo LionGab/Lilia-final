@@ -389,7 +389,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
   // Não precisamos mais dessa função, o App.tsx gerencia a navegação
 
   return (
-    <div className="flex flex-col h-screen bg-white dark:bg-slate-900 relative w-full transition-colors safe-area-inset">
+    <div className="flex flex-col h-screen w-full bg-white dark:bg-slate-900 relative transition-colors">
       <ChatHeader onBack={onBack} onViewConversations={onViewConversations} />
 
       {/* Toolbar Minimalista - Mobile-first */}
