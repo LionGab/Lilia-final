@@ -25,7 +25,8 @@
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    # Permitir microfone e câmera para funcionalidades de áudio/imagem
+    Permissions-Policy = "geolocation=(), microphone=(self), camera=(self)"
 
 # Headers para arquivos estáticos (cache)
 [[headers]]
