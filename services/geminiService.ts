@@ -1,5 +1,5 @@
 import { GoogleGenAI, Content } from "@google/genai";
-import { LIA_SYSTEM_PROMPT, APP_NAME } from "../constants";
+import { APP_NAME } from "../constants";
 import { getAgentConfig } from "../config/agents";
 import { Message, Sender } from "../types";
 import { OnboardingData } from "../types/onboarding";
@@ -244,13 +244,12 @@ export const sendContentToGemini = async (
     });
   }
 
-  let basePrompt = agentConfig.systemPrompt || LIA_SYSTEM_PROMPT;
+  let basePrompt = agentConfig.systemPrompt;
   
   let contextPrompt = basePrompt;
   
   // Adicionar instruções de estilo de resposta se disponível
-  // Nota: aplica apenas se o agente suportar
-  if (onboardingContext?.estiloResposta && agentConfig.capabilities.supportsUserStyle) {
+  if (onboardingContext?.estiloResposta) {
     const styleInstructions: Record<string, string> = {
       'direto': 'IMPORTANTE: Seja direto e objetivo. Respostas curtas, sem enrolação. Vá direto ao ponto.',
       'amigavel': 'IMPORTANTE: Use tom amigável e próximo. Fale como um amigo experiente, caloroso e acessível.',
@@ -258,20 +257,20 @@ export const sendContentToGemini = async (
       'motivacional': 'IMPORTANTE: Use tom energético e encorajador. Foque no potencial e resultados positivos.',
       'educativo': 'IMPORTANTE: Seja didático e educativo. Explique detalhadamente, dê exemplos práticos e passo a passo.'
     };
-    
+
     const styleInstruction = styleInstructions[onboardingContext.estiloResposta];
     if (styleInstruction) {
       contextPrompt = `${basePrompt}\n\n[ESTILO DE RESPOSTA PREFERIDO PELO USUÁRIO]\n${styleInstruction}`;
     }
   }
-  
+
   if (enrichedContext) {
     const optimizedContext = optimizeContext(enrichedContext);
     contextPrompt = `${contextPrompt}\n\n${optimizedContext}`;
   }
-  
+
   // Adicionar observações específicas do usuário se houver
-  if (onboardingContext?.observacoes && agentConfig.capabilities.supportsUserNotes) {
+  if (onboardingContext?.observacoes) {
     contextPrompt = `${contextPrompt}\n\n[OBSERVAÇÕES ESPECÍFICAS DO USUÁRIO]\n${onboardingContext.observacoes}\n\nSiga essas observações ao responder.`;
   }
 

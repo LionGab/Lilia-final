@@ -1,8 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Message, Sender } from '../types';
 import { sendContentToGemini } from '../services/geminiService';
-import { processCopywriterRequest } from '../services/copywriterService';
-import { detectUserIntent, isExplicitCopywriterRequest } from '../services/modeDetectionService';
 import { getCurrentUser } from '../services/authService';
 import { checkAndMigrate } from '../services/migrationService';
 import { initTheme } from '../services/themeService';
@@ -13,9 +11,7 @@ import { getAgentConfig, type AgentId } from '../config/agents';
 import MessageBubble from './MessageBubble';
 import TypingIndicator from './TypingIndicator';
 import ChatHeader from './ChatHeader';
-import CopywriterResponse from './CopywriterResponse';
 import ExportButton from './ExportButton';
-import { CopywriterResponse as CopywriterResponseType } from '../types/copywriter';
 
 // Utility function to convert File to Base64
 const fileToBase64 = (file: File): Promise<string> => {
@@ -42,8 +38,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
   const [isInitialized, setIsInitialized] = useState(false);
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
   const [imagePreviewUrl, setImagePreviewUrl] = useState<string | null>(null);
-  const [copywriterMode, setCopywriterMode] = useState(false);
-  const [copywriterResponse, setCopywriterResponse] = useState<CopywriterResponseType | null>(null);
   const [onboardingData, setOnboardingData] = useState<OnboardingData | undefined>(undefined);
   const [currentThreadId, setCurrentThreadId] = useState<string | null>(threadId || null);
   
@@ -109,7 +103,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
 
   const initializeWelcomeMessage = (useOnboarding: boolean = true) => {
     // Criar mensagem de boas-vindas personalizada baseada no agente e onboarding
-    const currentAgentId = (agentId || 'lia-erl') as AgentId;
+    const currentAgentId = (agentId || 'clareza-med') as AgentId;
     const agentConfig = getAgentConfig(currentAgentId);
     const data = useOnboarding ? onboardingData : undefined;
     
@@ -130,13 +124,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
     };
     
     setMessages([welcomeMessage]);
-    
-    // Salvar mensagem de boas-vindas
-    if (currentThreadId) {
-      saveMemoryMessage(currentThreadId, welcomeMessage, isSupabaseThread).catch(() => {
-        // Ignorar erro silenciosamente
-      });
-    }
   };
 
   const scrollToBottom = () => {
@@ -151,11 +138,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
     const trimmedInputText = inputText.trim();
     if ((!trimmedInputText && !selectedImage && !audioBlob) || isLoading) return;
 
-    // Detect intent
-    const intent = detectUserIntent(trimmedInputText);
-    const explicitCopywriter = isExplicitCopywriterRequest(trimmedInputText);
-    const shouldUseCopywriter = copywriterMode || explicitCopywriter || intent === 'copywriter';
-
     const userMessage: Message = {
       id: Date.now().toString(),
       text: trimmedInputText || undefined,
@@ -167,12 +149,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
     };
 
     setMessages((prev) => [...prev, userMessage]);
-    
-    // Salvar mensagem do usuário imediatamente
-    if (currentThreadId) {
-      await saveMemoryMessage(currentThreadId, userMessage, isSupabaseThread);
-    }
-    
     setInputText('');
     setIsLoading(true);
 
@@ -191,58 +167,36 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
     }
 
     try {
-      // Handle copywriter mode
-      if (shouldUseCopywriter && trimmedInputText) {
-        const copywriterResult = await processCopywriterRequest(trimmedInputText, onboardingData);
-        setCopywriterResponse(copywriterResult);
-        
-        const aiMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          text: `Análise completa de copywriting gerada! Veja os detalhes abaixo.`,
-          sender: Sender.AI,
-          timestamp: Date.now(),
-        };
-        setMessages((prev) => [...prev, aiMessage]);
-      } else {
-        // Normal ERL mode
-        let base64Image: string | undefined;
-        let imageMimeType: string | undefined;
+      let base64Image: string | undefined;
+      let imageMimeType: string | undefined;
 
-        if (selectedImage) {
-          base64Image = await fileToBase64(selectedImage);
-          imageMimeType = selectedImage.type;
-        }
-
-        // Converter áudio para base64 se houver
-        let base64Audio: string | undefined;
-        let audioMimeType: string | undefined;
-        if (audioBlob) {
-          // Usar o tipo MIME do blob se disponível
-          const mimeType = audioBlob.type || 'audio/webm';
-          base64Audio = await fileToBase64(new File([audioBlob], 'audio.webm', { type: mimeType }));
-          audioMimeType = mimeType;
-        }
-
-        const response = await sendContentToGemini(messages, trimmedInputText, base64Image, imageMimeType, base64Audio, audioMimeType, onboardingData, agentId || undefined);
-        
-        const aiMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          text: response.text || undefined,
-          sender: Sender.AI,
-          timestamp: Date.now(),
-          imageUrl: response.imageUrl || undefined,
-          imageMimeType: response.mimeType || undefined,
-        };
-
-        setMessages((prev) => [...prev, aiMessage]);
-        
-        // Salvar mensagem da IA
-        if (currentThreadId) {
-          await saveMemoryMessage(currentThreadId, aiMessage, isSupabaseThread);
-        }
-        
-        setCopywriterResponse(null); // Clear copywriter response in normal mode
+      if (selectedImage) {
+        base64Image = await fileToBase64(selectedImage);
+        imageMimeType = selectedImage.type;
       }
+
+      // Converter áudio para base64 se houver
+      let base64Audio: string | undefined;
+      let audioMimeType: string | undefined;
+      if (audioBlob) {
+        // Usar o tipo MIME do blob se disponível
+        const mimeType = audioBlob.type || 'audio/webm';
+        base64Audio = await fileToBase64(new File([audioBlob], 'audio.webm', { type: mimeType }));
+        audioMimeType = mimeType;
+      }
+
+      const response = await sendContentToGemini(messages, trimmedInputText, base64Image, imageMimeType, base64Audio, audioMimeType, onboardingData, agentId || undefined);
+
+      const aiMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        text: response.text || undefined,
+        sender: Sender.AI,
+        timestamp: Date.now(),
+        imageUrl: response.imageUrl || undefined,
+        imageMimeType: response.mimeType || undefined,
+      };
+
+      setMessages((prev) => [...prev, aiMessage]);
     } catch (error) {
       logger.error('Erro ao enviar mensagem', error);
       
@@ -379,7 +333,6 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
     if (window.confirm('Tem certeza que deseja limpar esta conversa? Esta ação não pode ser desfeita.')) {
       // Limpar estado local
       setMessages([]);
-      setCopywriterResponse(null);
       setInputText('');
       setSelectedImage(null);
       setImagePreviewUrl(null);
@@ -428,16 +381,9 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
       {/* Chat Area - GPT Mobile Style */}
       <main className="flex-1 overflow-y-auto scroll-smooth bg-white dark:bg-slate-900 transition-colors overscroll-contain">
         {messages.map((msg) => (
-          <MessageBubble key={msg.id} message={msg} agentId={agentId || 'lia-erl'} />
+          <MessageBubble key={msg.id} message={msg} agentId={agentId || 'clareza-med'} />
         ))}
-        
-        {/* Copywriter Response - Full Width */}
-        {copywriterResponse && (
-          <div className="mt-4 animate-fade-in">
-            <CopywriterResponse response={copywriterResponse} />
-          </div>
-        )}
-        
+
         {isLoading && <TypingIndicator />}
         <div ref={messagesEndRef} />
       </main>

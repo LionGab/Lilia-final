@@ -41,7 +41,7 @@ const formatText = (text: string) => {
   });
 };
 
-const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agentId = 'lia-erl' }) => {
+const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agentId = 'clareza-med' }) => {
   const isAI = message.sender === Sender.AI;
   const agentConfig = getAgentConfig(agentId as AgentId);
   
