@@ -1,6 +1,7 @@
 import { LIA_SYSTEM_PROMPT } from '../constants';
 import { COPYWRITER_SYSTEM_PROMPT } from '../constants/copywriterPrompt';
 import { MED_SYSTEM_PROMPT } from '../constants/medPrompt';
+import { IMERSAO_MED_PROMPT } from '../constants/imersaoMedPrompt';
 import {
   ARQUITETO_CAMPANHA_PROMPT,
   ARQUITETO_OFERTA_11_ESTRELAS_PROMPT,
@@ -11,6 +12,7 @@ export type AgentId =
   | 'lia-erl'
   | 'copywriter'
   | 'med'
+  | 'imersao-med'
   | 'arquiteto-produto'
   | 'arquiteto-campanha'
   | 'arquiteto-oferta';
@@ -108,6 +110,27 @@ export const AGENT_REGISTRY: Record<AgentId, AgentConfig> = {
       icon: '🗺️',
       color: 'green',
       tags: ['Método ERL', 'Execução', 'Mapa Completo'],
+    },
+  },
+  'imersao-med': {
+    id: 'imersao-med',
+    name: 'Imersão MED - Suporte Completo',
+    title: 'IA de Suporte para Imersão MED',
+    description:
+      'Gerador de roteiros, mapa de posicionamento, estruturador de funil, detector de potencial, gerador de títulos, analisador de conteúdo e calculadora de comissão',
+    category: 'erl',
+    enabled: true,
+    systemPrompt: IMERSAO_MED_PROMPT,
+    capabilities: {
+      supportsUserStyle: true,
+      supportsUserNotes: true,
+      supportsImages: true,
+      supportsAudio: true,
+    },
+    ui: {
+      icon: '🚀',
+      color: 'purple',
+      tags: ['Imersão MED', 'Roteiros', 'Análise', 'Suporte'],
     },
   },
   'arquiteto-produto': {
