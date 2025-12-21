@@ -1,5 +1,6 @@
 import { LIA_SYSTEM_PROMPT } from '../constants';
 import { COPYWRITER_SYSTEM_PROMPT } from '../constants/copywriterPrompt';
+import { MED_SYSTEM_PROMPT } from '../constants/medPrompt';
 import {
   ARQUITETO_CAMPANHA_PROMPT,
   ARQUITETO_OFERTA_11_ESTRELAS_PROMPT,
@@ -9,6 +10,7 @@ import {
 export type AgentId =
   | 'lia-erl'
   | 'copywriter'
+  | 'med'
   | 'arquiteto-produto'
   | 'arquiteto-campanha'
   | 'arquiteto-oferta';
@@ -85,6 +87,27 @@ export const AGENT_REGISTRY: Record<AgentId, AgentConfig> = {
       icon: '✍️',
       color: 'orange',
       tags: ['Copywriting', 'Vendas', 'Roteiros'],
+    },
+  },
+  med: {
+    id: 'med',
+    name: 'MED - Motor de Execução Digital',
+    title: 'Mapa de Execução Digital Completo',
+    description:
+      'Transforma confusão em ERL executável: diagnóstico → decisão A/B → mapa completo + planos 7/30 dias + roteiros + scripts + contrato',
+    category: 'erl',
+    enabled: true,
+    systemPrompt: MED_SYSTEM_PROMPT,
+    capabilities: {
+      supportsUserStyle: true,
+      supportsUserNotes: true,
+      supportsImages: true,
+      supportsAudio: true,
+    },
+    ui: {
+      icon: '🗺️',
+      color: 'green',
+      tags: ['Método ERL', 'Execução', 'Mapa Completo'],
     },
   },
   'arquiteto-produto': {
