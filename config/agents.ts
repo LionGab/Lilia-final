@@ -2,6 +2,7 @@ import { LIA_SYSTEM_PROMPT } from '../constants';
 import { COPYWRITER_SYSTEM_PROMPT } from '../constants/copywriterPrompt';
 import { MED_SYSTEM_PROMPT } from '../constants/medPrompt';
 import { IMERSAO_MED_PROMPT } from '../constants/imersaoMedPrompt';
+import { ESTRUTURADOR_IMERSAO_PROMPT } from '../constants/estruturadorImersaoPrompt';
 import {
   ARQUITETO_CAMPANHA_PROMPT,
   ARQUITETO_OFERTA_11_ESTRELAS_PROMPT,
@@ -13,6 +14,7 @@ export type AgentId =
   | 'copywriter'
   | 'med'
   | 'imersao-med'
+  | 'estruturador-imersao'
   | 'arquiteto-produto'
   | 'arquiteto-campanha'
   | 'arquiteto-oferta';
@@ -131,6 +133,27 @@ export const AGENT_REGISTRY: Record<AgentId, AgentConfig> = {
       icon: '🚀',
       color: 'purple',
       tags: ['Imersão MED', 'Roteiros', 'Análise', 'Suporte'],
+    },
+  },
+  'estruturador-imersao': {
+    id: 'estruturador-imersao',
+    name: 'Estruturador de Imersão MED',
+    title: 'Designer Instrucional - Estrutura Completa',
+    description:
+      'Estrutura imersão completa de 2 dias: cronograma detalhado, mapas de execução (Caminho A/B), pilares teóricos, entregas práticas, exercícios estruturados e sumário executivo',
+    category: 'erl',
+    enabled: true,
+    systemPrompt: ESTRUTURADOR_IMERSAO_PROMPT,
+    capabilities: {
+      supportsUserStyle: true,
+      supportsUserNotes: true,
+      supportsImages: true,
+      supportsAudio: true,
+    },
+    ui: {
+      icon: '📋',
+      color: 'blue',
+      tags: ['Imersão MED', 'Estruturação', 'Design Instrucional', 'Cronograma'],
     },
   },
   'arquiteto-produto': {
