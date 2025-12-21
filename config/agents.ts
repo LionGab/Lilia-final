@@ -1,43 +1,22 @@
-import { LIA_SYSTEM_PROMPT } from '../constants';
-import { COPYWRITER_SYSTEM_PROMPT } from '../constants/copywriterPrompt';
-import { MED_SYSTEM_PROMPT } from '../constants/medPrompt';
-import { IMERSAO_MED_PROMPT } from '../constants/imersaoMedPrompt';
-import { ESTRUTURADOR_IMERSAO_PROMPT } from '../constants/estruturadorImersaoPrompt';
 import {
-  ARQUITETO_CAMPANHA_PROMPT,
-  ARQUITETO_OFERTA_11_ESTRELAS_PROMPT,
-  ARQUITETO_PRODUTO_PROMPT,
-} from '../constants/agentPrompts';
+  CLAREZA_MED_PROMPT,
+  PRODUTO_MED_PROMPT,
+  OFERTA_MED_PROMPT,
+  ROTEIROS_MED_PROMPT,
+  BASTIDORES_MED_PROMPT,
+  PLANO_MED_PROMPT,
+} from '../constants/medModosPrompts';
 
 export type AgentId =
-  | 'lia-erl'
-  | 'copywriter'
-  | 'med'
-  | 'imersao-med'
-  | 'estruturador-imersao'
-  | 'arquiteto-produto'
-  | 'arquiteto-campanha'
-  | 'arquiteto-oferta';
+  | 'clareza-med'
+  | 'produto-med'
+  | 'oferta-med'
+  | 'roteiros-med'
+  | 'bastidores-med'
+  | 'plano-med';
 
-export type AgentCategory = 'erl' | 'copywriter' | 'analise' | 'outros';
-export type AgentColor = 'orange' | 'blue' | 'purple' | 'green';
-
-export interface AgentCapabilities {
-  /** Se deve aplicar o estilo do onboarding (ex: direto/amigável) */
-  supportsUserStyle: boolean;
-  /** Se deve aplicar as observações do onboarding */
-  supportsUserNotes: boolean;
-  /** Declarativo (não aplicado como regra dura ainda) */
-  supportsImages: boolean;
-  /** Declarativo (não aplicado como regra dura ainda) */
-  supportsAudio: boolean;
-}
-
-export interface AgentUiConfig {
-  icon: string;
-  color: AgentColor;
-  tags: string[];
-}
+export type AgentCategory = 'med';
+export type AgentColor = 'purple' | 'orange' | 'blue' | 'green';
 
 export interface AgentConfig {
   id: AgentId;
@@ -47,199 +26,99 @@ export interface AgentConfig {
   category: AgentCategory;
   enabled: boolean;
   systemPrompt: string;
-  capabilities: AgentCapabilities;
-  ui: AgentUiConfig;
+  ui: {
+    icon: string;
+    color: AgentColor;
+  };
 }
 
 export const AGENT_REGISTRY: Record<AgentId, AgentConfig> = {
-  'lia-erl': {
-    id: 'lia-erl',
-    name: 'Lyla.IA',
-    title: 'Mentora de Negócios - Método ERL',
-    description: 'Ajuda a estruturar produtos, funis URL e planos de conteúdo de 7 dias',
-    category: 'erl',
+  'clareza-med': {
+    id: 'clareza-med',
+    name: 'Clareza MED',
+    title: 'Desbloqueio & Direção',
+    description: 'Estou perdida, não sei por onde começar',
+    category: 'med',
     enabled: true,
-    systemPrompt: LIA_SYSTEM_PROMPT,
-    capabilities: {
-      supportsUserStyle: true,
-      supportsUserNotes: true,
-      supportsImages: true,
-      supportsAudio: true,
-    },
+    systemPrompt: CLAREZA_MED_PROMPT,
     ui: {
-      icon: '🎯',
+      icon: '🧠',
       color: 'purple',
-      tags: ['Método ERL', 'Produtos', 'Funil'],
     },
   },
-  copywriter: {
-    id: 'copywriter',
-    name: 'Copywriter Profissional',
-    title: 'Especialista em Copywriting e Estratégia',
-    description:
-      'Análise completa de copywriting com 10 passos: público-alvo, promessa, funil, roteiros virais, textos de venda',
-    category: 'copywriter',
+  'produto-med': {
+    id: 'produto-med',
+    name: 'Produto MED',
+    title: 'Criadora de Produto Simples',
+    description: 'Sei pra quem, mas não sei o quê vender',
+    category: 'med',
     enabled: true,
-    systemPrompt: COPYWRITER_SYSTEM_PROMPT,
-    capabilities: {
-      supportsUserStyle: false,
-      supportsUserNotes: false,
-      supportsImages: true,
-      supportsAudio: true,
-    },
+    systemPrompt: PRODUTO_MED_PROMPT,
     ui: {
-      icon: '✍️',
+      icon: '🎁',
       color: 'orange',
-      tags: ['Copywriting', 'Vendas', 'Roteiros'],
     },
   },
-  med: {
-    id: 'med',
-    name: 'MED - Motor de Execução Digital',
-    title: 'Mapa de Execução Digital Completo',
-    description:
-      'Transforma confusão em ERL executável: diagnóstico → decisão A/B → mapa completo + planos 7/30 dias + roteiros + scripts + contrato',
-    category: 'erl',
+  'oferta-med': {
+    id: 'oferta-med',
+    name: 'Oferta MED',
+    title: 'Oferta & Posicionamento',
+    description: 'Tenho produto, não sei explicar/vender',
+    category: 'med',
     enabled: true,
-    systemPrompt: MED_SYSTEM_PROMPT,
-    capabilities: {
-      supportsUserStyle: true,
-      supportsUserNotes: true,
-      supportsImages: true,
-      supportsAudio: true,
-    },
+    systemPrompt: OFERTA_MED_PROMPT,
     ui: {
-      icon: '🗺️',
+      icon: '💎',
+      color: 'blue',
+    },
+  },
+  'roteiros-med': {
+    id: 'roteiros-med',
+    name: 'Roteiros MED',
+    title: 'Conteúdo ERL 2025',
+    description: 'Não sei o que postar',
+    category: 'med',
+    enabled: true,
+    systemPrompt: ROTEIROS_MED_PROMPT,
+    ui: {
+      icon: '🎬',
       color: 'green',
-      tags: ['Método ERL', 'Execução', 'Mapa Completo'],
     },
   },
-  'imersao-med': {
-    id: 'imersao-med',
-    name: 'Imersão MED - Suporte Completo',
-    title: 'IA de Suporte para Imersão MED',
-    description:
-      'Gerador de roteiros, mapa de posicionamento, estruturador de funil, detector de potencial, gerador de títulos, analisador de conteúdo e calculadora de comissão',
-    category: 'erl',
+  'bastidores-med': {
+    id: 'bastidores-med',
+    name: 'Bastidores MED',
+    title: 'Parcerias & Funis',
+    description: 'Quero trabalhar sem aparecer',
+    category: 'med',
     enabled: true,
-    systemPrompt: IMERSAO_MED_PROMPT,
-    capabilities: {
-      supportsUserStyle: true,
-      supportsUserNotes: true,
-      supportsImages: true,
-      supportsAudio: true,
-    },
+    systemPrompt: BASTIDORES_MED_PROMPT,
     ui: {
-      icon: '🚀',
+      icon: '🤝',
       color: 'purple',
-      tags: ['Imersão MED', 'Roteiros', 'Análise', 'Suporte'],
     },
   },
-  'estruturador-imersao': {
-    id: 'estruturador-imersao',
-    name: 'Estruturador de Imersão MED',
-    title: 'Designer Instrucional - Estrutura Completa',
-    description:
-      'Estrutura imersão completa de 2 dias: cronograma detalhado, mapas de execução (Caminho A/B), pilares teóricos, entregas práticas, exercícios estruturados e sumário executivo',
-    category: 'erl',
+  'plano-med': {
+    id: 'plano-med',
+    name: 'Plano MED',
+    title: 'Plano de 30 Dias',
+    description: 'Sei o que quero, não consigo organizar',
+    category: 'med',
     enabled: true,
-    systemPrompt: ESTRUTURADOR_IMERSAO_PROMPT,
-    capabilities: {
-      supportsUserStyle: true,
-      supportsUserNotes: true,
-      supportsImages: true,
-      supportsAudio: true,
-    },
+    systemPrompt: PLANO_MED_PROMPT,
     ui: {
-      icon: '📋',
-      color: 'blue',
-      tags: ['Imersão MED', 'Estruturação', 'Design Instrucional', 'Cronograma'],
-    },
-  },
-  'arquiteto-produto': {
-    id: 'arquiteto-produto',
-    name: 'Arquiteto de Produtos',
-    title: 'Criação de Produtos Bestseller',
-    description: 'Estrutura produtos digitais de alta conversão com metodologia comprovada',
-    category: 'outros',
-    enabled: true,
-    systemPrompt: ARQUITETO_PRODUTO_PROMPT,
-    capabilities: {
-      supportsUserStyle: false,
-      supportsUserNotes: false,
-      supportsImages: true,
-      supportsAudio: true,
-    },
-    ui: {
-      icon: '📦',
+      icon: '📅',
       color: 'orange',
-      tags: ['Arquitetos Iniciais', 'Produtos'],
-    },
-  },
-  'arquiteto-campanha': {
-    id: 'arquiteto-campanha',
-    name: 'Arquiteto de Campanha',
-    title: 'Ideias Centrais de Campanha',
-    description: 'Cria as ideias centrais da campanha que irão chamar a atenção do mercado',
-    category: 'outros',
-    enabled: true,
-    systemPrompt: ARQUITETO_CAMPANHA_PROMPT,
-    capabilities: {
-      supportsUserStyle: false,
-      supportsUserNotes: false,
-      supportsImages: true,
-      supportsAudio: true,
-    },
-    ui: {
-      icon: '💡',
-      color: 'orange',
-      tags: ['Arquitetos Iniciais', 'Campanhas'],
-    },
-  },
-  'arquiteto-oferta': {
-    id: 'arquiteto-oferta',
-    name: 'Arquiteto de Oferta 11 Estrelas',
-    title: 'Ofertas Irresistíveis',
-    description: 'Cria ofertas irresistíveis para a sua campanha com mecanismos únicos',
-    category: 'outros',
-    enabled: true,
-    systemPrompt: ARQUITETO_OFERTA_11_ESTRELAS_PROMPT,
-    capabilities: {
-      supportsUserStyle: false,
-      supportsUserNotes: false,
-      supportsImages: true,
-      supportsAudio: true,
-    },
-    ui: {
-      icon: '⭐',
-      color: 'blue',
-      tags: ['Arquitetos Iniciais', 'Ofertas'],
     },
   },
 };
 
-export type AgentCategoryId = 'todos' | 'erl' | 'copywriter' | 'arquitetos';
-export interface AgentCategoryConfig {
-  id: AgentCategoryId;
-  label: string;
-  icon: string;
-}
-
-export const AGENT_CATEGORIES: AgentCategoryConfig[] = [
-  { id: 'todos', label: 'Todos os Agentes', icon: '📋' },
-  { id: 'erl', label: 'Método ERL', icon: '🎯' },
-  { id: 'copywriter', label: 'Copywriting', icon: '✍️' },
-  { id: 'arquitetos', label: 'Arquitetos Iniciais', icon: '🏗️' },
-];
-
 export const getAgentConfig = (id: string | undefined): AgentConfig => {
-  if (!id) return AGENT_REGISTRY['lia-erl'];
+  if (!id) return AGENT_REGISTRY['clareza-med'];
   const key = id as AgentId;
-  return AGENT_REGISTRY[key] ?? AGENT_REGISTRY['lia-erl'];
+  return AGENT_REGISTRY[key] ?? AGENT_REGISTRY['clareza-med'];
 };
 
 export const listEnabledAgents = (): AgentConfig[] => {
   return Object.values(AGENT_REGISTRY).filter((a) => a.enabled);
 };
-
-
