@@ -11,19 +11,20 @@ import { logger } from "./logger";
 // The API key is injected automatically from the environment
 const getApiKey = (): string => {
   // Tentar múltiplas formas de acessar a chave
-  const apiKey = 
-    process.env.API_KEY || 
-    process.env.GEMINI_API_KEY ||
+  // No Vite, variáveis de ambiente são acessadas via import.meta.env
+  const apiKey =
+    import.meta.env.VITE_GEMINI_API_KEY ||
+    import.meta.env.VITE_API_KEY ||
     (typeof window !== 'undefined' && (window as any).__GEMINI_API_KEY__) ||
     '';
-  
+
   if (!apiKey || apiKey === 'undefined' || apiKey === 'null' || apiKey.trim() === '') {
     const isProduction = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
-    
+
     if (isProduction) {
-      throw new Error('Chave da API Gemini não encontrada. Configure a variável de ambiente GEMINI_API_KEY no Netlify Dashboard (Site settings → Environment variables).');
+      throw new Error('❌ Erro: VITE_GEMINI_API_KEY não configurada\n\n⚠️ IMPORTANTE: Este projeto usa a API Gemini (Google AI), não OpenAI!\n\nVerifique se:\n1. A variável de ambiente VITE_GEMINI_API_KEY está configurada no Netlify Dashboard\n2. Site settings → Environment variables → Adicione VITE_GEMINI_API_KEY\n3. O site foi reimplantado após adicionar a variável\n\nObtenha sua chave gratuita em: https://makersuite.google.com/app/apikey');
     } else {
-      throw new Error('Chave da API Gemini não encontrada. Verifique o arquivo .env.local e certifique-se de que GEMINI_API_KEY está configurado.');
+      throw new Error('❌ Erro: VITE_GEMINI_API_KEY não configurada\n\n⚠️ IMPORTANTE: Este projeto usa a API Gemini (Google AI), não OpenAI!\n\nVerifique se:\n1. O arquivo .env.local existe na raiz do projeto (mesmo nível que package.json)\n2. Contém exatamente: VITE_GEMINI_API_KEY=sua_chave_aqui\n3. Não há espaços antes ou depois do =\n4. O servidor de desenvolvimento foi reiniciado após criar/modificar o arquivo\n5. A chave da API está válida no Google AI Studio\n\nObtenha sua chave gratuita em: https://makersuite.google.com/app/apikey');
     }
   }
   return apiKey.trim();
@@ -283,7 +284,12 @@ export const sendContentToGemini = async (
       // Validar chave da API antes de fazer a requisição
       const apiKey = getApiKey();
       if (!apiKey) {
-        throw new Error('Chave da API não configurada');
+        const isProduction = typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+        if (isProduction) {
+          throw new Error('VITE_GEMINI_API_KEY não configurada. Configure a variável de ambiente VITE_GEMINI_API_KEY no Netlify Dashboard (Site settings → Environment variables).');
+        } else {
+          throw new Error('VITE_GEMINI_API_KEY não configurada. Verifique se o arquivo .env.local existe e contém: VITE_GEMINI_API_KEY=sua_chave_aqui');
+        }
       }
 
       const history = formatHistory(currentHistory);

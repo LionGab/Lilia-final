@@ -42,7 +42,7 @@ const FinancialSimulator: React.FC<FinancialSimulatorProps> = ({ onBack }) => {
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900 p-4 sm:p-6">
+    <div className="min-h-screen bg-white dark:bg-black p-4 sm:p-6">
       <div className="max-w-6xl mx-auto">
         <button
           onClick={onBack}

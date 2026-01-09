@@ -54,40 +54,40 @@ export const AGENT_REGISTRY: Record<AgentId, AgentConfig> = {
   },
   'clareza-med': {
     id: 'clareza-med',
-    name: 'Clareza MED',
-    title: 'Desbloqueio & Direção',
-    description: 'Estou perdida, não sei por onde começar',
+    name: 'AVATAR',
+    title: 'Construção de Avatar',
+    description: 'Vamos criar seu cliente ideal do zero',
     category: 'med',
     enabled: true,
     systemPrompt: CLAREZA_MED_PROMPT,
     ui: {
-      icon: '🧠',
+      icon: '👤',
       color: 'purple',
     },
   },
   'produto-med': {
     id: 'produto-med',
-    name: 'Produto MED',
-    title: 'Criadora de Produto Simples',
-    description: 'Sei pra quem, mas não sei o quê vender',
+    name: 'OFERTA',
+    title: 'Crie sua Oferta',
+    description: 'Perfeito amiga, já com o avatar criado, vamos definir sua oferta! 😊 Para começarmos, copie o avatar criado aqui para eu entender melhor seu cliente ideal.',
     category: 'med',
     enabled: true,
     systemPrompt: PRODUTO_MED_PROMPT,
     ui: {
-      icon: '🎁',
+      icon: '💝',
       color: 'orange',
     },
   },
   'oferta-med': {
     id: 'oferta-med',
-    name: 'Oferta MED',
-    title: 'Oferta & Posicionamento',
-    description: 'Tenho produto, não sei explicar/vender',
+    name: 'PROMESSA',
+    title: 'Promessa para 6 Alunas',
+    description: 'Vamos criar uma promessa irresistível para suas primeiras 6 alunas',
     category: 'med',
     enabled: true,
     systemPrompt: OFERTA_MED_PROMPT,
     ui: {
-      icon: '💎',
+      icon: '✨',
       color: 'blue',
     },
   },
@@ -165,5 +165,11 @@ export const getAgentConfig = (id: string | undefined): AgentConfig => {
 };
 
 export const listEnabledAgents = (): AgentConfig[] => {
-  return Object.values(AGENT_REGISTRY).filter((a) => a.enabled);
+  const enabledAgents = Object.values(AGENT_REGISTRY).filter((a) => a.enabled);
+  // Ordenar para que 'lyla-mestre' apareça por último
+  return enabledAgents.sort((a, b) => {
+    if (a.id === 'lyla-mestre') return 1;
+    if (b.id === 'lyla-mestre') return -1;
+    return 0;
+  });
 };

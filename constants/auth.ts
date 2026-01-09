@@ -1,6 +1,7 @@
 // Lista de emails permitidos (máximo 10 usuários)
 // Adicione os emails autorizados aqui
 export const ALLOWED_EMAILS: string[] = [
+  'admin@admin.com',
   'admin@lilia-lainy.com',
   'raylaneedyle@gmail.com',
   'leilesantos@outlook.com',

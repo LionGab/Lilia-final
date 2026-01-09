@@ -159,7 +159,7 @@ const App: React.FC = () => {
   // Mostrar loading enquanto verifica autenticação
   if (isChecking) {
     return (
-      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 flex items-center justify-center transition-colors">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-black flex items-center justify-center transition-colors">
         <div className="text-slate-500 dark:text-slate-400">Carregando...</div>
       </div>
     );
@@ -178,7 +178,7 @@ const App: React.FC = () => {
   // Renderizar diferentes views
   if (currentView === 'tutorials') {
     return (
-      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 transition-colors">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-black transition-colors">
         <div className="h-screen w-full">
           <TutorialsPanel onBack={handleBackToAgents} />
         </div>
@@ -188,7 +188,7 @@ const App: React.FC = () => {
 
   if (currentView === 'ideas') {
     return (
-      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 transition-colors">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-black transition-colors">
         <div className="h-screen w-full">
           <BusinessIdeasPanel onBack={handleBackToAgents} />
         </div>
@@ -198,7 +198,7 @@ const App: React.FC = () => {
 
   if (currentView === 'personalization') {
     return (
-      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 transition-colors">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-black transition-colors">
         <div className="h-screen w-full">
           <PersonalizationPanel onBack={handleBackToAgents} />
         </div>
@@ -208,7 +208,7 @@ const App: React.FC = () => {
 
   if (currentView === 'diagnostic') {
     return (
-      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 transition-colors">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-black transition-colors">
         <DiagnosticFlow onComplete={handleDiagnosticComplete} onBack={handleBackToAgents} />
       </div>
     );
@@ -216,7 +216,7 @@ const App: React.FC = () => {
 
   if (currentView === 'financial') {
     return (
-      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 transition-colors">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-black transition-colors">
         <FinancialSimulator onBack={handleBackToAgents} />
       </div>
     );
@@ -224,7 +224,7 @@ const App: React.FC = () => {
 
   if (currentView === 'recommendations') {
     return (
-      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 transition-colors">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-black transition-colors">
         <ProductRecommendation onBack={handleBackToAgents} />
       </div>
     );
@@ -232,7 +232,7 @@ const App: React.FC = () => {
 
   if (currentView === 'funnel') {
     return (
-      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 transition-colors">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-black transition-colors">
         <FunnelBuilder onBack={handleBackToAgents} />
       </div>
     );
@@ -240,7 +240,7 @@ const App: React.FC = () => {
 
   if (currentView === 'content') {
     return (
-      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 transition-colors">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-black transition-colors">
         <ContentGenerator onBack={handleBackToAgents} />
       </div>
     );
@@ -248,7 +248,7 @@ const App: React.FC = () => {
 
   if (currentView === 'sales-script') {
     return (
-      <div className="min-h-screen w-full bg-slate-50 dark:bg-slate-900 transition-colors">
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-black transition-colors">
         <SalesScriptGenerator onBack={handleBackToAgents} />
       </div>
     );
@@ -293,7 +293,7 @@ const App: React.FC = () => {
 
   return (
     <>
-      <div className="min-h-screen w-full bg-white dark:bg-slate-900 transition-colors">
+      <div className="min-h-screen w-full bg-white dark:bg-black transition-colors">
         <ChatInterface 
           agentId={selectedAgent} 
           onBack={handleBackToAgents}

@@ -17,7 +17,7 @@ const ChatHeader: React.FC<ChatHeaderProps> = ({ onBack, onViewConversations }) 
   };
 
   return (
-    <header className="flex-none bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-3 sm:px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center justify-between z-10 sticky top-0">
+    <header className="flex-none bg-white dark:bg-black border-b border-slate-100 dark:border-slate-800 px-3 sm:px-4 py-3 pt-[calc(0.75rem+env(safe-area-inset-top))] flex items-center justify-between z-10 sticky top-0">
       <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
         {onBack && (
           <button

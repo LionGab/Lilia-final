@@ -288,7 +288,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onSkip 
                   className={`p-4 sm:p-4 rounded-xl border-2 transition-all text-left touch-manipulation ${
                     selectedTemplate?.id === template.id
                       ? 'border-brand-600 dark:border-brand-500 bg-brand-50 dark:bg-brand-900/20 shadow-lg'
-                      : 'border-slate-200 dark:border-slate-700 active:border-brand-300 dark:active:border-brand-600 bg-white dark:bg-slate-900'
+                      : 'border-slate-200 dark:border-slate-700 active:border-brand-300 dark:active:border-brand-600 bg-white dark:bg-black'
                   }`}
                 >
                   <div className="flex items-start gap-3">
@@ -368,7 +368,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onSkip 
                       className={`w-full p-4 sm:p-4 rounded-xl border-2 transition-all text-left touch-manipulation ${
                         selectedStyle === style.id
                           ? 'border-brand-600 dark:border-brand-500 bg-brand-50 dark:bg-brand-900/20 shadow-lg'
-                          : 'border-slate-200 dark:border-slate-700 active:border-brand-300 dark:active:border-brand-600 bg-white dark:bg-slate-900'
+                          : 'border-slate-200 dark:border-slate-700 active:border-brand-300 dark:active:border-brand-600 bg-white dark:bg-black'
                       }`}
                     >
                       <div className="flex items-start gap-3">
@@ -406,7 +406,7 @@ const OnboardingScreen: React.FC<OnboardingScreenProps> = ({ onComplete, onSkip 
                       className={`w-full p-4 sm:p-4 rounded-xl border-2 transition-all text-left touch-manipulation ${
                         selectedStyle === style.id
                           ? 'border-brand-600 dark:border-brand-500 bg-brand-50 dark:bg-brand-900/20 shadow-lg'
-                          : 'border-slate-200 dark:border-slate-700 active:border-brand-300 dark:active:border-brand-600 bg-white dark:bg-slate-900'
+                          : 'border-slate-200 dark:border-slate-700 active:border-brand-300 dark:active:border-brand-600 bg-white dark:bg-black'
                       }`}
                     >
                       <div className="flex items-start gap-3">

@@ -53,7 +53,7 @@ const DiagnosticFlow: React.FC<DiagnosticFlowProps> = ({ onComplete, onBack }) =
 
   if (result) {
     return (
-      <div className="min-h-screen bg-white dark:bg-slate-900 p-4 sm:p-6">
+      <div className="min-h-screen bg-white dark:bg-black p-4 sm:p-6">
         <div className="max-w-2xl mx-auto">
           <button
             onClick={onBack}
@@ -127,7 +127,7 @@ const DiagnosticFlow: React.FC<DiagnosticFlowProps> = ({ onComplete, onBack }) =
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-white dark:bg-slate-900 flex items-center justify-center">
+      <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600 mx-auto mb-4"></div>
           <p className="text-slate-600 dark:text-slate-400">Processando diagnóstico...</p>
@@ -137,7 +137,7 @@ const DiagnosticFlow: React.FC<DiagnosticFlowProps> = ({ onComplete, onBack }) =
   }
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900 p-4 sm:p-6">
+    <div className="min-h-screen bg-white dark:bg-black p-4 sm:p-6">
       <div className="max-w-2xl mx-auto">
         <button
           onClick={onBack}

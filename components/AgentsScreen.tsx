@@ -85,7 +85,7 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({
   };
 
   return (
-    <div className="flex h-screen w-full bg-white dark:bg-slate-900 text-slate-900 dark:text-white overflow-hidden transition-colors">
+    <div className="flex h-screen w-full bg-white dark:bg-black text-slate-900 dark:text-white overflow-hidden transition-colors">
       {/* Overlay mobile */}
       {showSidebar && (
         <div
@@ -101,7 +101,7 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({
             <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-lg overflow-hidden flex-shrink-0">
               <img
                 src="/images/logo-main.jpg"
-                alt="Lyla MED Logo"
+                alt="LYLYA-ERL Logo"
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   const target = e.target as HTMLImageElement;
@@ -110,8 +110,8 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({
               />
             </div>
             <h1 className="text-lg sm:text-xl font-bold">
-              <span className="text-slate-900 dark:text-white">Lyla</span>
-              <span className="text-brand-600 dark:text-brand-400"> MED</span>
+              <span className="text-slate-900 dark:text-white">LYLYA</span>
+              <span className="text-brand-600 dark:text-brand-400">-ERL</span>
             </h1>
             <button
               onClick={() => setShowSidebar(false)}
@@ -203,9 +203,9 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-slate-900 transition-colors min-w-0">
+      <main className="flex-1 flex flex-col overflow-hidden bg-white dark:bg-black transition-colors min-w-0">
         {/* Header */}
-        <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between transition-colors">
+        <header className="bg-white dark:bg-black border-b border-slate-200 dark:border-slate-800 px-3 sm:px-6 py-3 sm:py-4 flex items-center justify-between transition-colors">
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setShowSidebar(!showSidebar)}
@@ -220,7 +220,7 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({
         </header>
 
         {/* Agents Grid */}
-        <div className="flex-1 overflow-y-auto p-3 sm:p-6 bg-slate-50 dark:bg-slate-900 transition-colors overscroll-contain min-h-0">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6 bg-slate-50 dark:bg-black transition-colors overscroll-contain min-h-0">
           <div className="max-w-4xl mx-auto w-full">
             <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 text-center">
               Escolha o modo que resolve seu travamento agora

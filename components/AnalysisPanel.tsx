@@ -11,7 +11,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis }) => {
       <h3 className="text-lg font-bold text-slate-800 dark:text-white">📊 Análise da Conversa</h3>
       
       {/* Progresso */}
-      <div className="bg-white dark:bg-slate-900 p-3 rounded-lg">
+      <div className="bg-white dark:bg-black p-3 rounded-lg">
         <div className="flex justify-between items-center mb-2">
           <span className="text-sm font-medium text-slate-700 dark:text-slate-300">Progresso</span>
           <span className="text-sm font-bold text-brand-600 dark:text-brand-400">{analysis.progresso.porcentagem}%</span>
@@ -26,7 +26,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis }) => {
       </div>
       
       {/* Blocos Completados */}
-      <div className="bg-white dark:bg-slate-900 p-3 rounded-lg">
+      <div className="bg-white dark:bg-black p-3 rounded-lg">
         <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Blocos Completados</h4>
         <div className="space-y-1">
           <div className={`text-xs ${analysis.blocosCompletados.diagnostico ? 'text-green-600 dark:text-green-400' : 'text-slate-400 dark:text-slate-500'}`}>
@@ -46,7 +46,7 @@ const AnalysisPanel: React.FC<AnalysisPanelProps> = ({ analysis }) => {
       
       {/* Insights */}
       {analysis.insights.recomendacoes.length > 0 && (
-        <div className="bg-white dark:bg-slate-900 p-3 rounded-lg">
+        <div className="bg-white dark:bg-black p-3 rounded-lg">
           <h4 className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Próximos Passos</h4>
           <ul className="space-y-1">
             {analysis.proximosPassos.map((passo, i) => (

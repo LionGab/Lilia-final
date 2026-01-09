@@ -44,7 +44,7 @@ const SalesScriptGenerator: React.FC<SalesScriptGeneratorProps> = ({ onBack }) =
   };
 
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900 p-4 sm:p-6">
+    <div className="min-h-screen bg-white dark:bg-black p-4 sm:p-6">
       <div className="max-w-4xl mx-auto">
         <button
           onClick={onBack}

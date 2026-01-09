@@ -205,8 +205,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
       if (error instanceof Error) {
         if (error.message.includes('timeout') || error.message.includes('demorou')) {
           errorText = "A requisição demorou muito. Tente novamente em alguns instantes.";
-        } else if (error.message.includes('API') || error.message.includes('chave')) {
-          errorText = "Erro de configuração. Verifique as configurações da API.";
+        } else if (error.message.includes('API') || error.message.includes('chave') || error.message.includes('VITE_GEMINI_API_KEY') || error.message.includes('OPENAI')) {
+          if (error.message.includes('VITE_GEMINI_API_KEY') || error.message.includes('Gemini')) {
+            errorText = error.message;
+          } else {
+            errorText = "❌ Erro: VITE_GEMINI_API_KEY não configurada\n\n⚠️ IMPORTANTE: Este projeto usa a API Gemini (Google AI), não OpenAI!\n\nVerifique se:\n1. O arquivo .env.local existe na raiz do projeto\n2. Contém: VITE_GEMINI_API_KEY=sua_chave_aqui\n3. O servidor de desenvolvimento foi reiniciado após criar/modificar o arquivo\n4. A chave da API está válida no Google AI Studio\n\nObtenha sua chave gratuita em: https://makersuite.google.com/app/apikey";
+          }
         } else if (error.message.includes('quota') || error.message.includes('limite')) {
           errorText = "Limite de requisições atingido. Tente novamente em alguns minutos.";
         } else {
@@ -354,12 +358,12 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
   // Não precisamos mais dessa função, o App.tsx gerencia a navegação
 
   return (
-    <div className="flex flex-col h-screen w-full bg-white dark:bg-slate-900 relative transition-colors">
+    <div className="flex flex-col h-screen w-full bg-white dark:bg-black relative transition-colors">
       <ChatHeader onBack={onBack} onViewConversations={onViewConversations} />
 
       {/* Toolbar Minimalista - Mobile-first */}
       {messages.length > 0 && (
-        <div className="flex-none bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 px-3 sm:px-6 py-2 transition-colors overflow-x-auto">
+        <div className="flex-none bg-white dark:bg-black border-b border-slate-100 dark:border-slate-800 px-3 sm:px-6 py-2 transition-colors overflow-x-auto">
           <div className="flex items-center justify-between gap-2 min-w-max">
             <div className="flex items-center gap-2">
               <ExportButton messages={messages} />
@@ -379,7 +383,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
       )}
 
       {/* Chat Area - GPT Mobile Style */}
-      <main className="flex-1 overflow-y-auto scroll-smooth bg-white dark:bg-slate-900 transition-colors overscroll-contain">
+      <main className="flex-1 overflow-y-auto scroll-smooth bg-white dark:bg-black transition-colors overscroll-contain">
         {messages.map((msg) => (
           <MessageBubble key={msg.id} message={msg} agentId={agentId || 'clareza-med'} />
         ))}
@@ -389,7 +393,7 @@ const ChatInterface: React.FC<ChatInterfaceProps> = ({ agentId, onBack, threadId
       </main>
 
       {/* Input Area - Mobile-first */}
-      <footer className="flex-none bg-white dark:bg-slate-900 border-t border-slate-100 dark:border-slate-800 px-3 sm:px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sticky bottom-0 z-10 transition-colors">
+      <footer className="flex-none bg-white dark:bg-black border-t border-slate-100 dark:border-slate-800 px-3 sm:px-4 py-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] sticky bottom-0 z-10 transition-colors">
         {/* Preview de imagem */}
         {imagePreviewUrl && (
           <div className="relative mb-3 p-2 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800">

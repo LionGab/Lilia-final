@@ -3,18 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#db2777" />
+    <meta name="theme-color" content="#000000" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <link rel="manifest" href="/manifest.json" />
-    <title>Funil ERL</title>
+    <title>LYLY-IA</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
-      /* Custom scrollbar for webkit */
+      /* Custom scrollbar for webkit - LYLY-IA style */
       ::-webkit-scrollbar {
-        width: 8px;
+        width: 4px;
       }
       ::-webkit-scrollbar-track {
         background: transparent;
@@ -26,13 +26,13 @@
       ::-webkit-scrollbar-thumb:hover {
         background: #cbd5e1;
       }
-      
-      /* Dark mode scrollbar */
+
+      /* Dark mode scrollbar - preto puro LYLY-IA */
       .dark ::-webkit-scrollbar-thumb {
-        background: #475569;
+        background: #333333;
       }
       .dark ::-webkit-scrollbar-thumb:hover {
-        background: #64748b;
+        background: #555555;
       }
       
       /* Safe area insets para iOS */
@@ -63,8 +63,9 @@
     </style>
     <script>
       // Inicializar tema antes do React carregar para evitar flash
+      // LYLY-IA usa tema dark por padrão
       (function() {
-        const theme = localStorage.getItem('lia_theme_preference') || 'light';
+        const theme = localStorage.getItem('lia_theme_preference') || 'dark';
         document.documentElement.classList.remove('light', 'dark');
         document.documentElement.classList.add(theme);
       })();
@@ -80,7 +81,7 @@
       }
     </script>
   </head>
-  <body class="bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white antialiased">
+  <body class="bg-white dark:bg-black text-slate-900 dark:text-slate-50 antialiased">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
   </body>

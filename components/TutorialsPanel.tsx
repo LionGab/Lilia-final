@@ -10,7 +10,7 @@ const TutorialsPanel: React.FC<TutorialsPanelProps> = ({ onBack }) => {
 
   if (selectedTutorial) {
     return (
-      <div className="h-full flex flex-col bg-white dark:bg-slate-900">
+      <div className="h-full flex flex-col bg-white dark:bg-black">
         <div className="flex-none border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center gap-3">
           <button
             onClick={() => {
@@ -52,7 +52,7 @@ const TutorialsPanel: React.FC<TutorialsPanelProps> = ({ onBack }) => {
   }
 
   return (
-    <div className="h-full flex flex-col bg-white dark:bg-slate-900">
+    <div className="h-full flex flex-col bg-white dark:bg-black">
       <div className="flex-none border-b border-slate-200 dark:border-slate-800 px-6 py-4 flex items-center gap-3">
         {onBack && (
           <button
