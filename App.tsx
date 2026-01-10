@@ -13,6 +13,7 @@ import ProductRecommendation from './components/ProductRecommendation';
 import FunnelBuilder from './components/FunnelBuilder';
 import ContentGenerator from './components/ContentGenerator';
 import SalesScriptGenerator from './components/SalesScriptGenerator';
+import OfferCreatorFlow from './components/OfferCreatorFlow';
 import InstallPrompt from './components/InstallPrompt';
 import { isAuthenticated, getCurrentUser } from './services/authService';
 import { initTheme } from './services/themeService';
@@ -20,7 +21,7 @@ import { OnboardingData } from './types/onboarding';
 import { DiagnosticResult } from './types/diagnostic';
 import { createThread } from './services/threadService';
 
-type ViewMode = 'agents' | 'chat' | 'tutorials' | 'ideas' | 'personalization' | 'conversations' | 'diagnostic' | 'financial' | 'recommendations' | 'funnel' | 'content' | 'sales-script';
+type ViewMode = 'agents' | 'chat' | 'tutorials' | 'ideas' | 'personalization' | 'conversations' | 'diagnostic' | 'financial' | 'recommendations' | 'funnel' | 'content' | 'sales-script' | 'offer-creator';
 
 const App: React.FC = () => {
   const [authenticated, setAuthenticated] = useState<boolean>(false);
@@ -152,6 +153,10 @@ const App: React.FC = () => {
     setCurrentView('sales-script');
   };
 
+  const handleViewOfferCreator = () => {
+    setCurrentView('offer-creator');
+  };
+
   const handleDiagnosticComplete = (_result: DiagnosticResult) => {
     setCurrentView('agents');
   };
@@ -254,6 +259,14 @@ const App: React.FC = () => {
     );
   }
 
+  if (currentView === 'offer-creator') {
+    return (
+      <div className="min-h-screen w-full bg-slate-50 dark:bg-black transition-colors">
+        <OfferCreatorFlow onBack={handleBackToAgents} />
+      </div>
+    );
+  }
+
   if (currentView === 'agents') {
     return (
       <>
@@ -270,6 +283,7 @@ const App: React.FC = () => {
             onViewFunnel={handleViewFunnel}
             onViewContent={handleViewContent}
             onViewSalesScript={handleViewSalesScript}
+            onViewOfferCreator={handleViewOfferCreator}
           />
         </div>
         <InstallPrompt />

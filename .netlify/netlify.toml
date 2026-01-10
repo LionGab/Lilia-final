@@ -7,10 +7,9 @@ plugins = []
 [functions."*"]
 
 [build]
-publish = "C:\\Users\\User\\Downloads\\erl---lilia-lainy-ai\\dist"
+publish = "C:\\Users\\User\\Desktop\\LyLia\\dist"
 publishOrigin = "config"
 commandOrigin = "config"
-base = "C:\\Users\\User\\Downloads\\erl---lilia-lainy-ai"
 command = "npm run build"
 
 [build.environment]
@@ -36,7 +35,7 @@ X-Frame-Options = "DENY"
 X-XSS-Protection = "1; mode=block"
 X-Content-Type-Options = "nosniff"
 Referrer-Policy = "strict-origin-when-cross-origin"
-Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+Permissions-Policy = "geolocation=(), microphone=(self), camera=(self)"
 
 [[headers]]
 for = "/assets/*"

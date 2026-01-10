@@ -97,3 +97,54 @@ Todos os agentes fazem parte do **MED - Motor de Execução Digital**:
 npm run build
 npm run preview
 ```
+
+## Deploy no Netlify
+
+### 1. Configurar Variáveis de Ambiente no Netlify Dashboard
+
+**IMPORTANTE:** As variáveis de ambiente devem ser configuradas no painel do Netlify, não no arquivo `netlify.toml` (que é versionado).
+
+1. **Acesse o Netlify Dashboard:**
+   - Faça login em https://app.netlify.com
+   - Selecione seu site
+
+2. **Navegue até Environment variables:**
+   - Site settings → Environment variables → Add a variable
+
+3. **Adicione as seguintes variáveis:**
+
+   ```
+   VITE_SUPABASE_URL=sua_url_do_supabase
+   VITE_SUPABASE_ANON_KEY=sua_anon_key_do_supabase
+   VITE_GEMINI_API_KEY=sua_api_key_do_gemini
+   ```
+
+   > **Nota:** Obtenha suas chaves em:
+   > - Supabase: https://supabase.com/dashboard (Settings → API)
+   > - Gemini: https://aistudio.google.com/apikey
+
+4. **Salve as variáveis** e **reimplante o site:**
+   - Site overview → Deploys → Trigger deploy → Deploy site
+   - Ou faça um novo commit/push para o repositório conectado
+
+### 2. Verificar Configuração do Deploy
+
+O arquivo `netlify.toml` já está configurado com:
+
+- ✅ Build command: `npm run build`
+- ✅ Publish directory: `dist`
+- ✅ Node version: `18`
+- ✅ Headers de segurança
+- ✅ Redirecionamentos para SPA
+
+### 3. Após Configurar as Variáveis
+
+- ✅ Faça um novo deploy para aplicar as variáveis
+- ✅ As variáveis estarão disponíveis durante o build e em runtime
+- ✅ Verifique os logs do deploy para confirmar que as variáveis foram carregadas
+
+**⚠️ Importante:**
+
+- Nunca commite credenciais reais no código
+- Use sempre variáveis de ambiente no Netlify Dashboard
+- O arquivo `.env.local` é apenas para desenvolvimento local

@@ -17,6 +17,7 @@ interface AgentsScreenProps {
   onViewFunnel?: () => void;
   onViewContent?: () => void;
   onViewSalesScript?: () => void;
+  onViewOfferCreator?: () => void;
 }
 
 const AgentsScreen: React.FC<AgentsScreenProps> = ({
@@ -31,6 +32,7 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({
   onViewFunnel,
   onViewContent,
   onViewSalesScript,
+  onViewOfferCreator,
 }) => {
   const [threads, setThreads] = useState<ReturnType<typeof getAllThreads>>([]);
   const [showSidebar, setShowSidebar] = useState(() => {
@@ -225,6 +227,23 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({
             <p className="text-sm text-slate-600 dark:text-slate-400 mb-6 text-center">
               Escolha o modo que resolve seu travamento agora
             </p>
+
+            {/* Botão de Destaque - Criador de Oferta */}
+            {onViewOfferCreator && (
+              <button
+                onClick={onViewOfferCreator}
+                className="w-full mb-6 bg-gradient-to-r from-brand-600 to-purple-600 hover:from-brand-700 hover:to-purple-700 text-white rounded-xl p-5 shadow-lg hover:shadow-xl transition-all"
+              >
+                <div className="flex items-center justify-center gap-4">
+                  <span className="text-3xl">🚀</span>
+                  <div className="text-left">
+                    <h3 className="text-lg font-bold">Criador de Oferta Completa</h3>
+                    <p className="text-sm opacity-90">Avatar → Oferta → Promessa → Produto → Roteiros</p>
+                  </div>
+                  <span className="text-2xl">→</span>
+                </div>
+              </button>
+            )}
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {AGENTS.map((agent) => (

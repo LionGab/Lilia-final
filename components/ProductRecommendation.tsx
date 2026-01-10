@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { RecommendationResult, ProductRecommendation } from '../types/recommendation';
+import { RecommendationResult } from '../types/recommendation';
 import { generateRecommendations, saveRecommendations, loadRecommendations } from '../services/recommendationService';
 import { loadDiagnostic } from '../services/diagnosticService';
 import { getCurrentUser } from '../services/authService';
