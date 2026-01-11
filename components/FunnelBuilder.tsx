@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FunnelStructure, FunnelStep } from '../types/funnel';
+import { FunnelStructure } from '../types/funnel';
 import { generateFunnel, saveFunnel } from '../services/funnelService';
 import { getCurrentUser } from '../services/authService';
 import { loadDiagnostic } from '../services/diagnosticService';

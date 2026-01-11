@@ -80,9 +80,10 @@ export const gerarRoteirosEstrategicos = async (
 export const gerarMapaPosicionamento = async (
   habilidades: string[],
   experiencia: string,
-  preferencias: Record<string, any>
+  _preferencias: Record<string, unknown>
 ): Promise<MapaPosicionamento> => {
   try {
+    void _preferencias; // Reservado para uso futuro
     logger.info('Gerando mapa de posicionamento', { habilidades, experiencia });
     return {
       paraQuem: '',

@@ -14,6 +14,21 @@
     /* Touch-friendly sizes */
     --touch-target-min: 44px; /* WCAG AAA minimum */
     --tap-area-comfortable: 48px;
+
+    /* Focus ring - usando cores do brand definidas em tailwind.config.ts */
+    --focus-ring-color: #ec4899; /* brand-500 */
+    --focus-ring-offset: 2px;
+    --focus-ring-width: 2px;
+
+    /* Transition durations */
+    --transition-fast: 150ms;
+    --transition-normal: 250ms;
+    --transition-slow: 400ms;
+  }
+
+  /* Dark mode variables */
+  .dark {
+    --focus-ring-color: #f472b6; /* brand-400 */
   }
 
   /* Mobile-first typography */
@@ -52,9 +67,95 @@
     display: flex;
     flex-direction: column;
   }
+
+  /* ==========================================
+     ACESSIBILIDADE - FOCUS VISIBLE
+     ========================================== */
+
+  /* Focus ring padrão para todos os elementos interativos */
+  :focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: var(--focus-ring-offset);
+  }
+
+  /* Remove outline padrão (focus-visible cuida disso) */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Estilo específico para inputs */
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: var(--focus-ring-width) solid var(--focus-ring-color);
+    outline-offset: 0;
+    border-color: var(--focus-ring-color);
+  }
+
+  /* ==========================================
+     ACESSIBILIDADE - REDUCED MOTION
+     ========================================== */
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+
+  /* ==========================================
+     ACESSIBILIDADE - HIGH CONTRAST
+     ========================================== */
+
+  @media (prefers-contrast: high) {
+    :root {
+      --focus-ring-width: 3px;
+    }
+
+    /* Aumentar contraste de bordas */
+    * {
+      border-color: currentColor !important;
+    }
+  }
+
+  /* ==========================================
+     SCREEN READER ONLY
+     ========================================== */
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Mostrar quando focado (skip links) */
+  .sr-only-focusable:focus,
+  .sr-only-focusable:focus-within {
+    position: static;
+    width: auto;
+    height: auto;
+    padding: inherit;
+    margin: inherit;
+    overflow: visible;
+    clip: auto;
+    white-space: normal;
+  }
 }
 
-/* Mobile-first animations */
+/* ==========================================
+   ANIMAÇÕES
+   ========================================== */
+
 @keyframes fade-in {
   0% {
     opacity: 0;
@@ -77,7 +178,31 @@
   }
 }
 
-/* Mobile-first utilities */
+@keyframes pulse-subtle {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+@keyframes shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-4px);
+  }
+  75% {
+    transform: translateX(4px);
+  }
+}
+
+/* ==========================================
+   UTILITIES
+   ========================================== */
+
 @layer utilities {
   /* Touch-friendly: áreas de toque mínimas */
   .touch-target {
@@ -100,5 +225,68 @@
   .no-zoom {
     touch-action: manipulation;
   }
-}
 
+  /* Animações customizadas */
+  .animate-fade-in {
+    animation: fade-in var(--transition-slow) ease-out forwards;
+  }
+
+  .animate-slide-up {
+    animation: slide-up var(--transition-slow) ease-out forwards;
+  }
+
+  .animate-pulse-subtle {
+    animation: pulse-subtle 2s ease-in-out infinite;
+  }
+
+  .animate-shake {
+    animation: shake 0.4s ease-in-out;
+  }
+
+  /* Gradientes de texto */
+  .text-gradient-brand {
+    background: linear-gradient(135deg, #ec4899, #a855f7); /* brand-500 to purple-500 */
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Scrollbar customizada */
+  .scrollbar-thin {
+    scrollbar-width: thin;
+    scrollbar-color: #94a3b8 transparent; /* slate-400 */
+  }
+
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #94a3b8; /* slate-400 */
+    border-radius: 3px;
+  }
+
+  .dark .scrollbar-thin {
+    scrollbar-color: #475569 transparent; /* slate-600 */
+  }
+
+  .dark .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: #475569; /* slate-600 */
+  }
+
+  /* Glass effect */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+
+  .dark .glass {
+    background: rgba(0, 0, 0, 0.2);
+  }
+}

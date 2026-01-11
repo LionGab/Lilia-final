@@ -24,16 +24,24 @@ const AgentsScreen: React.FC<AgentsScreenProps> = ({
   onSelectAgent,
   onViewHistory,
   onViewTutorials,
-  onViewIdeas,
+  onViewIdeas: _onViewIdeas,
   onViewPersonalization,
-  onViewDiagnostic,
-  onViewFinancial,
-  onViewRecommendations,
-  onViewFunnel,
-  onViewContent,
-  onViewSalesScript,
+  onViewDiagnostic: _onViewDiagnostic,
+  onViewFinancial: _onViewFinancial,
+  onViewRecommendations: _onViewRecommendations,
+  onViewFunnel: _onViewFunnel,
+  onViewContent: _onViewContent,
+  onViewSalesScript: _onViewSalesScript,
   onViewOfferCreator,
 }) => {
+  // Props reservadas para uso futuro
+  void _onViewIdeas;
+  void _onViewDiagnostic;
+  void _onViewFinancial;
+  void _onViewRecommendations;
+  void _onViewFunnel;
+  void _onViewContent;
+  void _onViewSalesScript;
   const [threads, setThreads] = useState<ReturnType<typeof getAllThreads>>([]);
   const [showSidebar, setShowSidebar] = useState(() => {
     if (typeof window !== 'undefined') {

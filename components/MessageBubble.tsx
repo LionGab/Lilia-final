@@ -1,168 +1,177 @@
 import React from 'react';
 import { Message, Sender } from '../types';
 import { getAgentConfig, type AgentId } from '../config/agents';
+import { Avatar } from './ui/Avatar';
+import { cn, type AgentColor, SEMANTIC_COLORS, RADIUS, SHADOW } from '../theme/tokens';
 
 interface MessageBubbleProps {
   message: Message;
   agentId?: string;
 }
 
-// Function to format currency values found in text (e.g. R$ 1000 -> R$ 1.000,00)
-const formatCurrencyValues = (text: string) => {
-  // Regex looks for "R$" followed by optional whitespace and a number (with optional decimals)
+/**
+ * Formata valores monetários encontrados no texto (ex: R$ 1000 -> R$ 1.000,00)
+ */
+const formatCurrencyValues = (text: string): string => {
   return text.replace(/R\$\s*(\d+(?:[.,]\d{1,2})?)(?!\d)/gi, (match, value) => {
-    // Replace comma with dot for parsing if necessary
     const normalizedValue = value.replace(',', '.');
     const number = parseFloat(normalizedValue);
-    
     if (isNaN(number)) return match;
-
-    // Format to Brazilian Portuguese currency
     return number.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   });
 };
 
-// Simple formatter to handle bold text (**text**), line breaks, and apply currency formatting
-const formatText = (text: string) => {
-  // First apply currency formatting to the raw text
+/**
+ * Formata texto com bold (**texto**), quebras de linha e valores monetários
+ */
+const formatText = (text: string): React.ReactNode[] => {
   const textWithCurrency = formatCurrencyValues(text);
-  
-  // Then split for bold and newlines
   const parts = textWithCurrency.split(/(\*\*.*?\*\*|\n)/g);
-  
+
   return parts.map((part, index) => {
     if (part === '\n') {
       return <br key={index} />;
     }
     if (part.startsWith('**') && part.endsWith('**')) {
-      return <strong key={index} className="font-bold">{part.slice(2, -2)}</strong>;
+      return (
+        <strong key={index} className="font-bold">
+          {part.slice(2, -2)}
+        </strong>
+      );
     }
     return part;
   });
 };
 
+/**
+ * Componente de bolha de mensagem estilo GPT Mobile
+ *
+ * Features:
+ * - Avatar do agente com cor temática
+ * - Suporte a imagens, áudio e texto formatado
+ * - Acessibilidade completa (ARIA)
+ * - Tema claro/escuro
+ */
 const MessageBubble: React.FC<MessageBubbleProps> = ({ message, agentId = 'clareza-med' }) => {
   const isAI = message.sender === Sender.AI;
   const agentConfig = getAgentConfig(agentId as AgentId);
-  
-  // Cores por agente (estilo GPT Mobile)
-  const getAgentColorClasses = () => {
-    switch (agentConfig.ui.color) {
-      case 'purple':
-        return {
-          avatar: 'bg-purple-100 dark:bg-purple-900/30',
-          bubble: 'bg-white dark:bg-slate-800',
-          text: 'text-slate-800 dark:text-slate-200',
-        };
-      case 'orange':
-        return {
-          avatar: 'bg-orange-100 dark:bg-orange-900/30',
-          bubble: 'bg-white dark:bg-slate-800',
-          text: 'text-slate-800 dark:text-slate-200',
-        };
-      case 'blue':
-        return {
-          avatar: 'bg-blue-100 dark:bg-blue-900/30',
-          bubble: 'bg-white dark:bg-slate-800',
-          text: 'text-slate-800 dark:text-slate-200',
-        };
-      case 'green':
-        return {
-          avatar: 'bg-green-100 dark:bg-green-900/30',
-          bubble: 'bg-white dark:bg-slate-800',
-          text: 'text-slate-800 dark:text-slate-200',
-        };
-      default:
-        return {
-          avatar: 'bg-slate-100 dark:bg-slate-700',
-          bubble: 'bg-white dark:bg-slate-800',
-          text: 'text-slate-800 dark:text-slate-200',
-        };
-    }
-  };
-  
-  const colors = getAgentColorClasses();
+  const agentColor = (agentConfig?.ui?.color || 'slate') as AgentColor;
+
+  const timestamp = new Date(message.timestamp).toLocaleTimeString('pt-BR', {
+    hour: '2-digit',
+    minute: '2-digit',
+  });
 
   return (
-    <div className={`flex w-full gap-3 px-4 py-3 ${isAI ? 'justify-start' : 'justify-end'} animate-fade-in`}>
+    <article
+      className={cn(
+        'flex w-full gap-3 px-4 py-3 animate-fade-in',
+        isAI ? 'justify-start' : 'justify-end'
+      )}
+      aria-label={`Mensagem ${isAI ? 'da IA' : 'do usuário'} às ${timestamp}`}
+    >
       {/* Avatar - apenas para mensagens da IA */}
       {isAI && (
-        <div className={`flex-none w-8 h-8 rounded-full overflow-hidden ${colors.avatar} flex items-center justify-center mt-0.5 flex-shrink-0`}>
-          <img 
-            src="/images/logo-main.jpg" 
-            alt="Lyla.IA" 
-            className="w-full h-full object-cover"
-            onError={(e) => {
-              // Fallback se a imagem não carregar
-              const target = e.target as HTMLImageElement;
-              target.style.display = 'none';
-              const parent = target.parentElement!;
-              parent.className = 'flex-none w-9 h-9 sm:w-8 sm:h-8 rounded-full bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center text-brand-600 dark:text-brand-400 font-semibold text-sm mt-0.5 sm:mt-1 flex-shrink-0';
-              parent.textContent = 'L';
-            }}
-          />
-        </div>
+        <Avatar
+          src="/images/logo-main.jpg"
+          alt={agentConfig?.name || 'Lyla.IA'}
+          fallback="L"
+          size="sm"
+          agentColor={agentColor}
+          className="mt-0.5 shrink-0"
+        />
       )}
-      
-      {/* Mensagem - Estilo GPT Mobile */}
-      <div className={`flex flex-col ${isAI ? 'items-start' : 'items-end'} max-w-[85%]`}>
+
+      {/* Container da mensagem */}
+      <div className={cn('flex flex-col max-w-[85%]', isAI ? 'items-start' : 'items-end')}>
+        {/* Bolha da mensagem */}
         <div
-          className={`rounded-2xl px-4 py-3 shadow-sm text-[15px] leading-relaxed ${
+          className={cn(
+            'px-4 py-3 text-[15px] leading-relaxed',
+            RADIUS.xl,
+            SHADOW.sm,
             isAI
-              ? `${colors.bubble} ${colors.text} rounded-tl-none`
-              : 'bg-[#0b93f6] dark:bg-[#0b93f6] text-white rounded-tr-none'
-          }`}
+              ? cn(
+                  SEMANTIC_COLORS.background.primary,
+                  SEMANTIC_COLORS.text.primary,
+                  'rounded-tl-none'
+                )
+              : 'bg-brand-600 text-white rounded-tr-none'
+          )}
         >
-          {/* Imagem - exibir primeiro se for a única coisa */}
+          {/* Imagem */}
           {message.imageUrl && (
-            <div className={`${message.text ? 'mb-3' : ''}`}>
-              <img 
-                src={message.imageUrl} 
-                alt={isAI ? "Imagem gerada pela IA" : "Imagem enviada"} 
-                className="rounded-xl max-w-full h-auto object-contain max-h-96 cursor-pointer hover:opacity-90 transition-opacity" 
+            <div className={cn(message.text && 'mb-3')}>
+              <button
+                type="button"
                 onClick={() => {
-                  // Abrir imagem em tela cheia ao clicar
                   const newWindow = window.open();
                   if (newWindow) {
-                    newWindow.document.write(`<img src="${message.imageUrl}" style="max-width: 100%; height: auto;" />`);
+                    newWindow.document.write(
+                      `<img src="${message.imageUrl}" style="max-width: 100%; height: auto;" alt="Imagem ampliada" />`
+                    );
                   }
                 }}
-              />
+                className={cn(
+                  'block rounded-xl overflow-hidden',
+                  'focus-visible:ring-2 focus-visible:ring-brand-500 focus-visible:ring-offset-2',
+                  'outline-none'
+                )}
+                aria-label={isAI ? 'Imagem gerada pela IA. Clique para ampliar' : 'Imagem enviada. Clique para ampliar'}
+              >
+                <img
+                  src={message.imageUrl}
+                  alt={isAI ? 'Imagem gerada pela IA' : 'Imagem enviada pelo usuário'}
+                  className="max-w-full h-auto object-contain max-h-96 hover:opacity-90 transition-opacity"
+                  loading="lazy"
+                />
+              </button>
             </div>
           )}
-          
+
           {/* Áudio */}
           {message.audioUrl && (
-            <div className={`${message.text || message.imageUrl ? 'mb-3' : ''}`}>
-              <audio 
-                src={message.audioUrl} 
-                controls 
+            <div className={cn((message.text || message.imageUrl) && 'mt-3')}>
+              <audio
+                src={message.audioUrl}
+                controls
                 className="w-full h-10 rounded-lg"
-              />
+                aria-label={isAI ? 'Áudio gerado pela IA' : 'Áudio enviado pelo usuário'}
+              >
+                Seu navegador não suporta o elemento de áudio.
+              </audio>
             </div>
           )}
-          
+
           {/* Texto */}
           {message.text && (
-            <div className="whitespace-pre-wrap break-words">
-              {formatText(message.text)}
-            </div>
+            <div className="whitespace-pre-wrap wrap-break-word">{formatText(message.text)}</div>
           )}
         </div>
-        
-        {/* Timestamp - abaixo da bolha */}
-        <div className={`text-[10px] mt-1 px-1 opacity-60 ${isAI ? 'text-slate-400 dark:text-slate-500' : 'text-slate-500 dark:text-slate-400'}`}>
-          {new Date(message.timestamp).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}
-        </div>
+
+        {/* Timestamp */}
+        <time
+          dateTime={new Date(message.timestamp).toISOString()}
+          className={cn(
+            'text-[10px] mt-1 px-1 opacity-60',
+            SEMANTIC_COLORS.text.tertiary
+          )}
+        >
+          {timestamp}
+        </time>
       </div>
-      
-      {/* Avatar do usuário - apenas para mensagens do usuário */}
+
+      {/* Avatar do usuário */}
       {!isAI && (
-        <div className="flex-none w-9 h-9 sm:w-8 sm:h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 font-semibold text-xs sm:text-xs mt-0.5 sm:mt-1">
-          U
-        </div>
+        <Avatar
+          fallback="U"
+          alt="Você"
+          size="sm"
+          agentColor="slate"
+          className="mt-0.5 shrink-0"
+        />
       )}
-    </div>
+    </article>
   );
 };
 

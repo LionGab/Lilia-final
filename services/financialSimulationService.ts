@@ -4,7 +4,7 @@ import { FinancialParameters, FinancialProjection, FinancialChartData } from '..
  * Calcula projeção financeira baseada nos parâmetros
  */
 export const calculateProjection = (params: FinancialParameters): FinancialProjection => {
-  const { ticketMedio, taxaConversao, investimentoMensal, custoProduto, margemLucro, periodo } = params;
+  const { ticketMedio, taxaConversao, investimentoMensal, custoProduto, periodo } = params;
 
   // Calcular vendas necessárias por mês para atingir ROI positivo
   const investimentoTotal = investimentoMensal * periodo;
@@ -52,8 +52,6 @@ export const generateChartData = (params: FinancialParameters): FinancialChartDa
 
   for (let i = 1; i <= periodo; i++) {
     const receitaMensal = vendasMensal * ticketMedio;
-    const custoMensal = vendasMensal * custoProduto;
-    const lucroMensal = receitaMensal - custoMensal - investimentoMensal;
 
     receitaAcumulada += receitaMensal;
     investimentoAcumulado += investimentoMensal;

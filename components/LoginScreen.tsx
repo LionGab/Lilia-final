@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { login } from '../services/authService';
 import { initTheme } from '../services/themeService';
+import { Button } from './ui/Button';
+import { Input } from './ui/Input';
+import { Card } from './ui/Card';
+import { Avatar } from './ui/Avatar';
+import { cn, TYPOGRAPHY } from '../theme/tokens';
 
 interface LoginScreenProps {
   onLoginSuccess: () => void;
@@ -38,91 +43,96 @@ const LoginScreen: React.FC<LoginScreenProps> = ({ onLoginSuccess }) => {
 
     setIsLoading(true);
 
-    // Simular pequeno delay para melhor UX
     setTimeout(() => {
       const success = login(trimmedEmail);
-      
+
       if (success) {
         onLoginSuccess();
       } else {
         setError('Este email não está autorizado. Entre em contato com o administrador.');
       }
-      
+
       setIsLoading(false);
     }, 300);
   };
 
   return (
-    <div className="min-h-screen w-full bg-black flex items-center justify-center p-4 sm:p-6 transition-colors">
-      <div className="w-full max-w-md bg-slate-900 rounded-2xl shadow-2xl p-6 sm:p-8 transition-colors border border-slate-800">
-        <div className="text-center mb-8">
-          <div className="w-24 h-24 rounded-2xl overflow-hidden bg-gradient-to-tr from-brand-500 to-purple-500 flex items-center justify-center shadow-lg mx-auto mb-4">
-            <img
+    <main
+      className="min-h-screen w-full bg-black flex items-center justify-center p-4 sm:p-6"
+      role="main"
+      aria-labelledby="login-title"
+    >
+      <Card
+        variant="default"
+        padding="lg"
+        className="w-full max-w-md bg-slate-900 border-slate-800"
+      >
+        {/* Header */}
+        <header className="text-center mb-8">
+          <div className="flex justify-center mb-4">
+            <Avatar
               src="/images/logo-main.jpg"
-              alt="LYLYA-ERL Logo"
-              className="w-full h-full object-cover"
-              onError={(e) => {
-                // Fallback se a imagem não carregar
-                const target = e.target as HTMLImageElement;
-                target.style.display = 'none';
-                const parent = target.parentElement!;
-                parent.className = 'w-24 h-24 rounded-2xl bg-gradient-to-tr from-brand-500 to-purple-500 flex items-center justify-center text-white font-bold text-3xl shadow-lg mx-auto mb-4';
-                parent.textContent = 'L';
-              }}
+              alt="LYLY-IA Logo"
+              fallback="L"
+              size="xl"
+              agentColor="purple"
+              className="ring-4 ring-brand-500/30"
             />
           </div>
-          <h1 className="text-2xl font-bold text-white mb-2">LYLY-IA</h1>
-          <p className="text-sm text-slate-400">Método ERL - Acesso Restrito</p>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-slate-300 mb-2">
-              Email
-            </label>
-            <input
-              id="email"
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setError(null);
-              }}
-              placeholder="seu@email.com"
-              className="w-full px-4 py-3 border border-slate-700 rounded-lg focus:ring-2 focus:ring-brand-500 focus:border-brand-500 outline-none transition-all text-white bg-slate-800"
-              disabled={isLoading}
-              autoFocus
-            />
-          </div>
-
-          {error && (
-            <div className="bg-red-900/20 border border-red-800 text-red-400 px-4 py-3 rounded-lg text-sm">
-              {error}
-            </div>
-          )}
-
-          <button
-            type="submit"
-            disabled={isLoading}
-            className={`w-full py-3.5 sm:py-3 px-4 rounded-lg font-medium text-white transition-all touch-manipulation ${
-              isLoading
-                ? 'bg-slate-600 cursor-not-allowed'
-                : 'bg-brand-600 active:bg-brand-700 shadow-md active:shadow-lg active:scale-[0.98]'
-            }`}
+          <h1
+            id="login-title"
+            className={cn(TYPOGRAPHY.h1, 'text-white mb-2')}
           >
-            {isLoading ? 'Verificando...' : 'Entrar'}
-          </button>
+            LYLY-IA
+          </h1>
+          <p className={cn(TYPOGRAPHY.bodySmall, 'text-slate-400')}>
+            Método ERL - Acesso Restrito
+          </p>
+        </header>
+
+        {/* Formulário */}
+        <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+          <Input
+            id="email"
+            type="email"
+            label="Email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              setError(null);
+            }}
+            placeholder="seu@email.com"
+            disabled={isLoading}
+            error={error || undefined}
+            autoFocus
+            autoComplete="email"
+            variant="default"
+            className="bg-slate-800 border-slate-700 text-white placeholder:text-slate-500"
+            containerClassName="[&_label]:text-slate-300"
+          />
+
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            fullWidth
+            isLoading={isLoading}
+            loadingText="Verificando..."
+            aria-label={isLoading ? 'Verificando credenciais' : 'Entrar na plataforma'}
+          >
+            Entrar
+          </Button>
         </form>
 
-        <div className="mt-6 text-center">
-          <p className="text-xs text-slate-500">
+        {/* Footer */}
+        <footer className="mt-6 text-center">
+          <p className={cn(TYPOGRAPHY.caption, 'text-slate-500')}>
             Apenas usuários autorizados podem acessar esta plataforma.
           </p>
-        </div>
-      </div>
-    </div>
+        </footer>
+      </Card>
+    </main>
   );
 };
 
 export default LoginScreen;
-

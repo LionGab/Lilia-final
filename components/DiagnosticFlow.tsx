@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DiagnosticQuestion, DiagnosticAnswer, DiagnosticResult } from '../types/diagnostic';
+import { DiagnosticAnswer, DiagnosticResult } from '../types/diagnostic';
 import { DIAGNOSTIC_QUESTIONS, processDiagnostic, saveDiagnostic } from '../services/diagnosticService';
 import { getCurrentUser } from '../services/authService';
 import { logger } from '../services/logger';
